@@ -1,36 +1,40 @@
 import { Injectable } from '@nestjs/common';
-import { deleteFileDto } from './dto/deleteFile.dto';
-import { downloadFileDto } from './dto/downloadFile.dto';
-import { getFilesDto } from './dto/getFiles.dto';
-import { updateFileDto } from './dto/updateFile.dto';
-import { uploadFilesDto } from './dto/uploadFile.dto';
+import { DeleteFileDto } from './dto/deleteFile.dto';
+import { DownloadFileDto } from './dto/downloadFile.dto';
+import { GetFilesDto } from './dto/getFiles.dto';
+import { UpdateFileDto } from './dto/updateFile.dto';
+import { UploadFilesDto } from './dto/uploadFile.dto';
 import { file } from './file.model';
 
 @Injectable()
 export class DriveService {
 
-    getFiles(getFilesDto: getFilesDto): file[] {
-        const {driveId} = getFilesDto;
+    createDrive(userCode: string) {
         return;
     }
 
-    downloadFile(downloadFileDto: downloadFileDto) {
-        const {driveId, fileId} = downloadFileDto;
+    getFiles(GetFilesDto: GetFilesDto): file[] {
+        const {driveId} = GetFilesDto;
         return;
     }
 
-    uploadFile(uploadFilesDto: uploadFilesDto) {
-        const {driveId} = uploadFilesDto;
+    downloadFile(DownloadFileDto: DownloadFileDto) {
+        const {driveId, fileId} = DownloadFileDto;
         return;
     }
 
-    updateFile(updateFileDto: updateFileDto) {
-        const {driveId, fileId} = updateFileDto;
+    uploadFile(UploadFilesDto: UploadFilesDto) {
+        const {driveId} = UploadFilesDto;
         return;
     }
 
-    deleteFile(deleteFileDto: deleteFileDto) {
-        const {driveId, fileId} = deleteFileDto;
+    updateFile(UpdateFileDto: UpdateFileDto) {
+        const {driveId, fileId} = UpdateFileDto;
+        return;
+    }
+
+    deleteFile(DeleteFileDto: DeleteFileDto) {
+        const {driveId, fileId} = DeleteFileDto;
         return;
     }
 }

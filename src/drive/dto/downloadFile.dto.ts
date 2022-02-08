@@ -1,4 +1,4 @@
-export class downloadFileDto {
+export class DownloadFileDto {
     driveId: string;
     fileId: string;
 }

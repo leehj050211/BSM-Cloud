@@ -1,3 +1,3 @@
-export class getFilesDto {
+export class GetFilesDto {
     driveId: string;
 }

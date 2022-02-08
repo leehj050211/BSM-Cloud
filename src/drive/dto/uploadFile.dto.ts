@@ -1,3 +1,3 @@
-export class uploadFilesDto {
+export class UploadFilesDto {
     driveId: string;
 }

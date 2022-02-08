@@ -1,4 +1,4 @@
-export class deleteFileDto {
+export class DeleteFileDto {
     driveId: string;
     fileId: string;
 }

@@ -1,7 +1,8 @@
 export interface file {
-    id: string;
-    uid: string;
+    fileId: string;
+    driveId: string;
+    userCode: string;
     name: string;
+    origin: string;
     created: string;
-    filePath: string;
 }
