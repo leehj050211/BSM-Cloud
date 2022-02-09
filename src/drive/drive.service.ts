@@ -5,7 +5,6 @@ import { DownloadFileDto } from './dto/downloadFile.dto';
 import { GetFilesDto } from './dto/getFiles.dto';
 import { UpdateFileDto } from './dto/updateFile.dto';
 import { UploadFilesDto } from './dto/uploadFile.dto';
-import { Drive } from './entity/drive.entity';
 import { DriveRepository } from './repository/drive.repository';
 import { FileRepository } from './repository/file.repository';
 
@@ -46,27 +45,27 @@ export class DriveService {
         }
     }
 
-    getFiles(GetFilesDto: GetFilesDto) {
+    getFiles(usercode: number, GetFilesDto: GetFilesDto) {
         const {driveId} = GetFilesDto;
         return;
     }
 
-    downloadFile(DownloadFileDto: DownloadFileDto) {
+    downloadFile(usercode: number, DownloadFileDto: DownloadFileDto) {
         const {driveId, fileId} = DownloadFileDto;
         return;
     }
 
-    uploadFile(UploadFilesDto: UploadFilesDto) {
+    uploadFile(usercode: number, UploadFilesDto: UploadFilesDto) {
         const {driveId} = UploadFilesDto;
         return;
     }
 
-    updateFile(UpdateFileDto: UpdateFileDto) {
+    updateFile(usercode: number, UpdateFileDto: UpdateFileDto) {
         const {driveId, fileId} = UpdateFileDto;
         return;
     }
 
-    deleteFile(DeleteFileDto: DeleteFileDto) {
+    deleteFile(usercode: number, DeleteFileDto: DeleteFileDto) {
         const {driveId, fileId} = DeleteFileDto;
         return;
     }

@@ -1,47 +1,66 @@
-import { Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { DriveService } from './drive.service';
 import { GetFilesDto } from './dto/getFiles.dto';
 import { UploadFilesDto } from './dto/uploadFile.dto';
 import { DownloadFileDto } from './dto/downloadFile.dto';
 import { UpdateFileDto } from './dto/updateFile.dto';
 import { DeleteFileDto } from './dto/deleteFile.dto';
+import JwtAuthGuard from 'src/auth/auth.guard';
+import { GetUser } from 'src/auth/getUser.decorator';
+import { User } from 'src/auth/user.model';
 
-@Controller('drive')
+@Controller('api/drive')
+@UseGuards(JwtAuthGuard)
 export class DriveController {
     constructor(private driveService: DriveService) {}
 
     @Post()
-    createDrive(@Query('usercode') usercode: number) {
-        return this.driveService.createDrive(usercode);
+    createDrive(@GetUser() user: User) {
+        return this.driveService.createDrive(user.memberCode);
     }
 
     @Get('')
-    getDriveId(@Query('usercode') usercode: number) {
-        return this.driveService.getDriveId(usercode);
+    getDriveId(@GetUser() user: User) {
+        return this.driveService.getDriveId(user.memberCode);
     }
 
     @Get(':driveId')
-    getFiles(@Param() GetFilesDto) {
-        return this.driveService.getFiles(GetFilesDto);
+    getFiles(
+        @GetUser() user: User,
+        @Param() GetFilesDto
+    ) {
+        return this.driveService.getFiles(user.memberCode, GetFilesDto);
     }
     
     @Get(':driveId/:fileId')
-    downloadFile(@Param() DownloadFileDto) {
-        return this.driveService.downloadFile(DownloadFileDto);
+    downloadFile(
+        @GetUser() user: User,
+        @Param() DownloadFileDto
+    ) {
+        return this.driveService.downloadFile(user.memberCode, DownloadFileDto);
     }
 
     @Post(':driveId')
-    uploadFile(@Param() UploadFilesDto) {
-        return this.driveService.uploadFile(UploadFilesDto);
+    uploadFile(
+        @GetUser() user: User,
+        @Param() UploadFilesDto
+    ) {
+        return this.driveService.uploadFile(user.memberCode, UploadFilesDto);
     }
 
     @Put(':driveId/:fileId')
-    updateFile(@Param() UpdateFileDto) {
-        return this.driveService.updateFile(UpdateFileDto);
+    updateFile(
+        @GetUser() user: User,
+        @Param() UpdateFileDto
+    ) {
+        return this.driveService.updateFile(user.memberCode, UpdateFileDto);
     }
 
     @Delete(':driveId/:fileId')
-    deleteFile(@Param() DeleteFileDto) {
-        return this.driveService.deleteFile(DeleteFileDto);
+    deleteFile(
+        @GetUser() user: User,
+        @Param() DeleteFileDto
+    ) {
+        return this.driveService.deleteFile(user.memberCode, DeleteFileDto);
     }
 }

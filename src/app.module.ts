@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Condition } from 'typeorm';
 
 import { DriveModule } from './drive/drive.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { DriveModule } from './drive/drive.module';
       logging: true,
       entities: [__dirname + '/**/entity/*.entity.{js,ts}']
     }),
-    DriveModule],
+    DriveModule,
+    AuthModule],
   controllers: [],
   providers: [],
 })
