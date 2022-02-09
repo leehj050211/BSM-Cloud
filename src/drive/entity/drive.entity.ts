@@ -1,7 +1,7 @@
-import { Entity, Column, Index } from 'typeorm';
+import { Entity, Column, Unique } from 'typeorm';
 
 @Entity()
-@Index(['id', 'userCode'])
+@Unique(['usercode'])
 export class Drive {
     @Column({
         type: 'binary',
@@ -9,8 +9,8 @@ export class Drive {
         primary: true,
         nullable: false
     })
-    id: BinaryData;
+    id: Buffer;
 
     @Column({nullable: false})
-    userCode: number;
+    usercode: number;
 }

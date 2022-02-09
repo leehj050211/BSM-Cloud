@@ -1,5 +1,4 @@
 import { Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
-import { file } from './file.model';
 import { DriveService } from './drive.service';
 import { GetFilesDto } from './dto/getFiles.dto';
 import { UploadFilesDto } from './dto/uploadFile.dto';
@@ -12,12 +11,17 @@ export class DriveController {
     constructor(private driveService: DriveService) {}
 
     @Post()
-    createDrive(@Query('userCode') userCode: string) {
-        return this.createDrive(userCode);
+    createDrive(@Query('usercode') usercode: number) {
+        return this.driveService.createDrive(usercode);
+    }
+
+    @Get('')
+    getDriveId(@Query('usercode') usercode: number) {
+        return this.driveService.getDriveId(usercode);
     }
 
     @Get(':driveId')
-    getFiles(@Param() GetFilesDto): file[] {
+    getFiles(@Param() GetFilesDto) {
         return this.driveService.getFiles(GetFilesDto);
     }
     

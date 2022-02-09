@@ -3,11 +3,11 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 
 import { DriveController } from './drive.controller';
 import { DriveService } from './drive.service';
-import { Drive } from './entity/drive.entity';
-import { File } from './entity/file.entity';
+import { DriveRepository } from './repository/drive.repository';
+import { FileRepository } from './repository/file.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Drive, File])],
+  imports: [TypeOrmModule.forFeature([DriveRepository, FileRepository])],
   controllers: [DriveController],
   providers: [DriveService]
 })
