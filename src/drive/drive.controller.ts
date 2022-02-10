@@ -1,6 +1,6 @@
-import { Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { DriveService } from './drive.service';
-import { GetFilesDto } from './dto/getFiles.dto';
+import { GetFileListDto } from './dto/getFileList.dto';
 import { UploadFilesDto } from './dto/uploadFile.dto';
 import { DownloadFileDto } from './dto/downloadFile.dto';
 import { UpdateFileDto } from './dto/updateFile.dto';
@@ -8,6 +8,8 @@ import { DeleteFileDto } from './dto/deleteFile.dto';
 import JwtAuthGuard from 'src/auth/auth.guard';
 import { GetUser } from 'src/auth/getUser.decorator';
 import { User } from 'src/auth/user.model';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { FileMulterOption } from './file.multerOption';
 
 @Controller('api/drive')
 @UseGuards(JwtAuthGuard)
@@ -25,11 +27,11 @@ export class DriveController {
     }
 
     @Get(':driveId')
-    getFiles(
+    getFileList(
         @GetUser() user: User,
-        @Param() GetFilesDto
+        @Param() GetFileListDto
     ) {
-        return this.driveService.getFiles(user.memberCode, GetFilesDto);
+        return this.driveService.getFileList(user.memberCode, GetFileListDto);
     }
     
     @Get(':driveId/:fileId')
@@ -40,12 +42,14 @@ export class DriveController {
         return this.driveService.downloadFile(user.memberCode, DownloadFileDto);
     }
 
+    @UseInterceptors(FileInterceptor('file', FileMulterOption))
     @Post(':driveId')
     uploadFile(
         @GetUser() user: User,
-        @Param() UploadFilesDto
+        @Param() UploadFilesDto,
+        @UploadedFile() inputFile
     ) {
-        return this.driveService.uploadFile(user.memberCode, UploadFilesDto);
+        return this.driveService.uploadFile(user.memberCode, UploadFilesDto, inputFile);
     }
 
     @Put(':driveId/:fileId')

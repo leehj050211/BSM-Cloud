@@ -1,8 +1,8 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteFileDto } from './dto/deleteFile.dto';
 import { DownloadFileDto } from './dto/downloadFile.dto';
-import { GetFilesDto } from './dto/getFiles.dto';
+import { GetFileListDto } from './dto/getFileList.dto';
 import { UpdateFileDto } from './dto/updateFile.dto';
 import { UploadFilesDto } from './dto/uploadFile.dto';
 import { DriveRepository } from './repository/drive.repository';
@@ -22,13 +22,13 @@ export class DriveService {
 
     async createDrive(usercode: number){
         const drive = await this.driveRepository.createDrive(usercode);
-        const driveId: string = drive.id.toString('hex')
+        const driveId: string = drive.id.toString('hex');
 
         try{
             await fs.promises.mkdir(`${__dirname}/../public/drive/${driveId}`); 
-        }catch (error){
-            console.error(error)
-            throw new InternalServerErrorException('Failed to create drive')
+        }catch(error){
+            console.error(error);
+            throw new InternalServerErrorException('Failed to create drive');
         }
 
         await this.driveRepository.save(drive);
@@ -36,16 +36,18 @@ export class DriveService {
     }
 
     async getDriveId(usercode: number) {
-        const driveId = await this.driveRepository.getDriveByUsercode(usercode);
-        if(!driveId){
-            throw new NotFoundException()
+        const result = await this.driveRepository.getDriveByUsercode(usercode);
+        if(!result){
+            throw new NotFoundException('Drive not found');
         }
+
+        const driveId = result.id.toString('hex');
         return {
-            driveId: driveId.id.toString('hex')
+            driveId: driveId
         }
     }
 
-    getFiles(usercode: number, GetFilesDto: GetFilesDto) {
+    getFileList(usercode: number, GetFilesDto: GetFileListDto) {
         const {driveId} = GetFilesDto;
         return;
     }
@@ -55,9 +57,31 @@ export class DriveService {
         return;
     }
 
-    uploadFile(usercode: number, UploadFilesDto: UploadFilesDto) {
-        const {driveId} = UploadFilesDto;
-        return;
+    async uploadFile(usercode: number, UploadFilesDto: UploadFilesDto, inputFile) {
+        const {driveId: inputDriveId} = UploadFilesDto;
+        // driveId check
+        const result = await this.driveRepository.getDriveByUsercode(usercode);
+        if(!result){
+            throw new NotFoundException('Drive not found');
+        }
+        const driveId = result.id.toString('hex');
+        if(inputDriveId !== driveId){
+            throw new BadRequestException(`Drive doesn't match`);
+        }
+        const file = await this.fileRepository.uploadFile(driveId, usercode, inputFile.originalname, inputFile.filename, new Date());
+        const fileId: string = file.fileId.toString('hex')
+
+        try{
+            await fs.promises.rename(inputFile.path, `${__dirname}/../public/drive/${driveId}/${inputFile.filename}`); 
+        }catch (error){
+            console.error(error)
+            throw new InternalServerErrorException('Failed to upload file');
+        }
+
+        await this.fileRepository.save(file);
+        return {
+            fileId: fileId
+        };
     }
 
     updateFile(usercode: number, UpdateFileDto: UpdateFileDto) {

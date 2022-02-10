@@ -2,15 +2,15 @@ import { EntityRepository, Repository } from "typeorm";
 import { Drive } from "../entity/drive.entity";
 
 import { v4 as getUuid } from 'uuid';
-import { ConflictException, InternalServerErrorException, NotFoundException } from "@nestjs/common";
+import { ConflictException, InternalServerErrorException } from "@nestjs/common";
 
 @EntityRepository(Drive)
 export class DriveRepository extends Repository<Drive> {
 
     async createDrive(usercode: number): Promise<Drive> {
-        const uuid = getUuid()
+        const uuid = getUuid().replaceAll('-', '')
         const drive = this.create({
-            id: new Buffer(uuid.replaceAll('-', ''), 'hex'),
+            id: new Buffer(uuid, 'hex'),
             usercode: usercode
         });
 

@@ -21,10 +21,14 @@ export class File {
     usercode: number;
 
     @Column({length: 64, nullable: false})
-    fileName: string;
+    originalName: string;
 
-    @Column({length: 128, nullable: false})
-    originPath: string;
+    @Column({
+        type: 'binary',
+        length: 16,
+        nullable: false
+    })
+    fileName: Buffer;
 
     @Column({nullable: false})
     created: Date;
