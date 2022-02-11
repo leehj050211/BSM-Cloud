@@ -47,14 +47,48 @@ export class DriveService {
         }
     }
 
-    getFileList(usercode: number, GetFilesDto: GetFileListDto) {
-        const {driveId} = GetFilesDto;
-        return;
+    async getFileList(usercode: number, GetFilesDto: GetFileListDto) {
+        const {driveId: inputDriveId} = GetFilesDto;
+        // driveId check
+        const result = await this.driveRepository.getDriveByUsercode(usercode);
+        if(!result){
+            throw new NotFoundException('Drive not found');
+        }
+        const driveId = result.id.toString('hex');
+        if(inputDriveId !== driveId){
+            throw new BadRequestException(`Drive doesn't match`);
+        }
+
+        const fileList = (await this.fileRepository.getFileList(driveId)).map(file => {
+            return {
+                fileId: file.fileId.toString('hex'),
+                fileName: file.originalName,
+                created: file.created
+            }
+        })
+        return fileList;
     }
 
-    downloadFile(usercode: number, DownloadFileDto: DownloadFileDto) {
-        const {driveId, fileId} = DownloadFileDto;
-        return;
+    async downloadFile(usercode: number, DownloadFileDto: DownloadFileDto) {
+        const {driveId: inputDriveId, fileId: inputFileId} = DownloadFileDto;
+        // driveId check
+        const result = await this.driveRepository.getDriveByUsercode(usercode);
+        if(!result){
+            throw new NotFoundException('Drive not found');
+        }
+        const driveId = result.id.toString('hex');
+        if(inputDriveId !== driveId){
+            throw new BadRequestException(`Drive doesn't match`);
+        }
+
+        const file = (await this.fileRepository.getFile(inputFileId));
+        if(!file){
+            throw new NotFoundException('File not found');
+        }
+        return {
+            originalName: file.originalName,
+            fileName: file.fileName.toString('hex')
+        };
     }
 
     async uploadFile(usercode: number, UploadFilesDto: UploadFilesDto, inputFile) {
@@ -68,6 +102,7 @@ export class DriveService {
         if(inputDriveId !== driveId){
             throw new BadRequestException(`Drive doesn't match`);
         }
+
         const file = await this.fileRepository.uploadFile(driveId, usercode, inputFile.originalname, inputFile.filename, new Date());
         const fileId: string = file.fileId.toString('hex')
 
