@@ -49,4 +49,37 @@ export class FileRepository extends Repository<File> {
             throw new InternalServerErrorException();
         }
     }
+
+    async updateFile(
+        fileId: string,
+        originalName: string,
+        fileName: string,
+        created: Date
+    ):Promise<void> {
+        try{
+            this.update({
+                fileId: new Buffer(fileId, 'hex')
+            }, {
+                originalName: originalName,
+                fileName: new Buffer(fileName, 'hex'),
+                created: created
+            })
+        }catch(error){
+            console.error(error)
+            throw new InternalServerErrorException();
+        }
+    }
+
+    async deleteFile(
+        fileId: string
+    ):Promise<void> {
+        try{
+            await this.delete({
+                fileId: new Buffer(fileId, 'hex'),
+            })
+        }catch(error){
+            console.error(error)
+            throw new InternalServerErrorException();
+        }
+    }
 }

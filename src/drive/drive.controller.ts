@@ -52,12 +52,14 @@ export class DriveController {
         return this.driveService.uploadFile(user.memberCode, UploadFilesDto, inputFile);
     }
 
+    @UseInterceptors(FileInterceptor('file', FileMulterOption))
     @Put(':driveId/:fileId')
     updateFile(
         @GetUser() user: User,
-        @Param() UpdateFileDto
+        @Param() UpdateFileDto,
+        @UploadedFile() inputFile
     ) {
-        return this.driveService.updateFile(user.memberCode, UpdateFileDto);
+        return this.driveService.updateFile(user.memberCode, UpdateFileDto, inputFile);
     }
 
     @Delete(':driveId/:fileId')
