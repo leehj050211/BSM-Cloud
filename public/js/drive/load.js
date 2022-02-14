@@ -20,6 +20,7 @@ const fileInfoView = Vue.createApp({
 }).mount('#file_info_bar');
 
 const loadDriveId = () => {
+    progress(20);
     driveId = window.location.pathname.split('/')[2];
     if (driveId) {
         history.pushState(null, null, `/drive/${driveId}`);
@@ -48,6 +49,7 @@ const loadDriveId = () => {
 }
 
 const loadFiles = () => {
+    progress(50);
     ajax({
         method: 'get',
         url: `drive/${driveId}`,

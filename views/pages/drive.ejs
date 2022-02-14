@@ -7,9 +7,6 @@
     <meta property="og:title" content="BSM Cloud">
     <meta property="og:description" content="BSM 클라우드 서비스">
     <link rel="stylesheet" type="text/css" href="/css/pages/drive.css">
-    <script src="/js/lib/vue.js"></script>
-    <script src="/js/lib/axios.js"></script>
-    <script src="/js/alert.js"></script>
     <script src="/js/common.js"></script>
 </head>
 <body>
@@ -37,6 +34,10 @@
                 <p>수정된 날짜: {{new Date(file.created).toLocaleString()}}</p>
             </div>
         </aside>
+        <label id="file_upload" for="file" class="clear_button">
+            <input id="file" type="file" onchange="uploadFile(this.files[0]);this.value=''">
+            <div></div>
+        </label>
     </main>
     <div>
         <div id="create_drive_box" class="popup main center">
@@ -68,6 +69,10 @@
             </div>
         </div>
     </div>
+    <script src="/js/alert.js"></script>
+    <script src="/js/lib/axios.js"></script>
+    <script src="/js/ajax.js"></script>
+    <script src="/js/lib/vue.js"></script>
     <script src="/js/drive/load.js"></script>
     <script src="/js/drive/main.js"></script>
 </body>
