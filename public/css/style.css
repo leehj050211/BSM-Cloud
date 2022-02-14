@@ -88,7 +88,6 @@ body{
   background-attachment:fixed;
   background-size:cover;
   transition:background-color .5s;
-  padding-bottom:5rem;
 }
 @font-face {
   font-family:'NotoSans';
@@ -382,7 +381,7 @@ input[type=number]{
   background-color:var(--hover) !important;
 }
 .main_button{
-  width:37.5rem;
+  width:100%;
 }
 .icon object{
   pointer-events:none;
@@ -409,6 +408,9 @@ input[type=number]{
   display:block;
   animation:popup_show 100ms ease-out;
 }
+.popup.main{
+  width:37.5rem;
+}
 @keyframes popup_show {
   from {
     transform:translate(-50%,-50%) scale(1.2);
@@ -422,6 +424,7 @@ input[type=number]{
 }
 .popup p{
   margin-bottom:1rem;
+  word-break:break-all;
 }
 .popup .bottom_box{
   display:flex;
@@ -429,7 +432,7 @@ input[type=number]{
   gap:2rem;
   margin-bottom:3rem;
 }
-.popup input:not([type=number]){
+.popup input[type=text]{
   display:block;
   margin-bottom:2rem;
 }
@@ -592,9 +595,6 @@ input[type=number]{
   html::-webkit-scrollbar{
     width:2px;
   }
-  body{
-    padding-bottom:1rem;
-  }
   h1{
     font-size:3.2rem;
   }
@@ -619,7 +619,7 @@ input[type=number]{
   .input_text{
     width:32.5rem;
   }
-  .main_button{
+  .popup.main{
     width:32.5rem;
   }
 }

@@ -100,7 +100,7 @@ window.addEventListener('DOMContentLoaded', () => {
 })
 
 const instance = axios.create({
-    baseURL:'http://localhost:4001/api/',
+    baseURL:'https://drive.bssm.kro.kr/api/',
     headers:{'Pragma':'no-cache'},
     timeout:3000,
 })
@@ -125,7 +125,14 @@ const ajax = async ({method, url, payload, callBack, errorCallBack}) => {
     }catch(err){
         console.log(err)
         loadingInit()
-        showAlert(err)
+        if(err.response){
+            if(errorCallBack && errorCallBack(err.response.data)){
+                return;
+            }
+            showAlert(`에러코드: ${err.response.data.statusCode} ${err.response.data.message}`)
+        }else{
+            showAlert(err)
+        }
         return;
     }
     try{
@@ -133,7 +140,7 @@ const ajax = async ({method, url, payload, callBack, errorCallBack}) => {
     }catch(err) {
         console.log(err)
         loadingInit()
-        showAlert(err)
+        showAlert('알 수 없는 에러가 발생하였습니다')
         return;
     }
     loadingInit()

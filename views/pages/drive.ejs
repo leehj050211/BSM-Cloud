@@ -16,20 +16,59 @@
     <%- include('../common/common') %>
     <main>
         <section id="file_section">
-            <div id="files_wrap">
-                <ul id="files">
-                    <li v-for="file in files">
-                        <div class="file_icon">
-                            {{file.fileName.split('.')[file.fileName.split('.').length-1]}}
-                        </div>
-                        <div class="file_name">
-                            {{file.fileName}}
-                        </div>
-                    </li>
-                </ul>
-            </div>
+            <ul id="files">
+                <li v-for="(file, idx) in files" :onclick="`selectFile(${idx})`">
+                    <div class="file_icon">
+                        {{file.fileName.split('.')[file.fileName.split('.').length-1]}}
+                    </div>
+                    <div class="file_name">
+                        {{file.fileName}}
+                    </div>
+                </li>
+            </ul>
         </section>
+        <aside id="file_info_bar">
+            <div id="file_top_bar">
+                <h2 v-if="file.fileName">{{file.fileName}}</h2>
+                <h2 v-if="!file.fileName">선택된 파일 없음</h2>
+            </div>
+            <div id="file_info" v-if="file.fileId">
+                <p>파일 ID: {{file.fileId}}</p>
+                <p>수정된 날짜: {{new Date(file.created).toLocaleString()}}</p>
+            </div>
+        </aside>
     </main>
+    <div>
+        <div id="create_drive_box" class="popup main center">
+            <form v-if="step==0" autocomplete="off" onsubmit="createDriveBoxView.changeStep(1);createDrive();return false;">
+                <div class="popup_close_button x_button" onClick="popupClose(this.parentElement.parentElement)"></div>
+                <h2>환영합니다</h2>
+                <p>
+                    BSM Cloud는 인터넷을 통해 언제 어디서나 접속할 수 있는 클라우드 서비스 입니다.
+                    <br>
+                    이 서비스를 이용하기 위해 BSM 계정이 필요하며 다음의 사용자 정보들이 필요합니다
+                </p>
+                <p>유저코드: 사용자를 식별하기 위해 필요</p>
+                <div class="bottom_box">
+                    <label>
+                        <input type="checkbox" required="true">
+                        정보 제공에 동의합니다
+                    </label>
+                </div>
+                <button type="submit" class="main_button button">드라이브 생성</button>
+            </form>
+            <div v-if="step==1">
+                <h2>생성중...</h2>
+                <p>드라이브 생성중 입니다. 잠시 기다려주세요.</p>
+            </div>
+            <div v-if="step==2">
+                <div class="popup_close_button x_button" onClick="popupClose(this.parentElement.parentElement)"></div>
+                <h2>성공</h2>
+                <p>드라이브 생성에 성공하였습니다.</p>
+            </div>
+        </div>
+    </div>
     <script src="/js/drive/load.js"></script>
+    <script src="/js/drive/main.js"></script>
 </body>
 </html>
