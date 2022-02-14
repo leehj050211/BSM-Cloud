@@ -7,6 +7,12 @@
     <meta property="og:title" content="BSM Cloud">
     <meta property="og:description" content="BSM 클라우드 서비스">
     <link rel="stylesheet" type="text/css" href="/css/pages/home.css">
+    <script>
+        window.addEventListener('resize', () => {
+            let vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        });
+    </script>
 </head>
 <body>
     <main>

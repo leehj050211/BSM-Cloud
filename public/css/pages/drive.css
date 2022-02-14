@@ -1,0 +1,44 @@
+@charset "utf-8";
+
+#files_wrap{
+    display:inline-block;
+}
+#files {
+    display:flex;
+    flex-wrap:wrap;
+    gap:1rem;
+}
+
+#files li{
+    display:flex;
+    flex-direction:column;
+    width:20rem;
+    height:20rem;
+    border-radius:1rem;
+    overflow:hidden;
+    background-color:var(--level-1);
+    cursor:pointer;
+    transition:.25s;
+    box-shadow:var(--shadow);
+}
+
+#files li:hover{
+    background-color:var(--hover);
+}
+
+.file_icon{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    width:100%;
+    flex:1;
+    font-weight:bold;
+    font-size:3rem;
+}
+.file_name{
+    display:flex;
+    align-items:center;
+    width:100%;
+    padding:1rem;
+    background-color:var(--level-2);
+}

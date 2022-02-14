@@ -1,0 +1,35 @@
+<html lang="kr">
+<head>
+    <%- include('../common/head') %>
+    <title>BSM Cloud</title>
+    <meta property="title" content="BSM Cloud">
+    <meta property="description" content="BSM 클라우드 서비스">
+    <meta property="og:title" content="BSM Cloud">
+    <meta property="og:description" content="BSM 클라우드 서비스">
+    <link rel="stylesheet" type="text/css" href="/css/pages/drive.css">
+    <script src="/js/lib/vue.js"></script>
+    <script src="/js/lib/axios.js"></script>
+    <script src="/js/alert.js"></script>
+    <script src="/js/common.js"></script>
+</head>
+<body>
+    <%- include('../common/common') %>
+    <main>
+        <section id="file_section">
+            <div id="files_wrap">
+                <ul id="files">
+                    <li v-for="file in files">
+                        <div class="file_icon">
+                            {{file.fileName.split('.')[file.fileName.split('.').length-1]}}
+                        </div>
+                        <div class="file_name">
+                            {{file.fileName}}
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+    </main>
+    <script src="/js/drive/load.js"></script>
+</body>
+</html>
