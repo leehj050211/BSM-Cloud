@@ -33,6 +33,9 @@
                 <p>파일 ID: {{file.fileId}}</p>
                 <p>수정된 날짜: {{new Date(file.created).toLocaleString()}}</p>
             </div>
+            <div id="file_menu" v-if="file.fileId">
+                <button class="button main_button" :onclick="`downloadFile('${file.fileId}')`">파일 다운로드</button>
+            </div>
         </aside>
         <label id="file_upload" for="file" class="clear_button">
             <input id="file" type="file" onchange="uploadFile(this.files[0]);this.value=''">
@@ -42,7 +45,6 @@
     <div>
         <div id="create_drive_box" class="popup main center">
             <form v-if="step==0" autocomplete="off" onsubmit="createDriveBoxView.changeStep(1);createDrive();return false;">
-                <div class="popup_close_button x_button" onClick="popupClose(this.parentElement.parentElement)"></div>
                 <h2>환영합니다</h2>
                 <p>
                     BSM Cloud는 인터넷을 통해 언제 어디서나 접속할 수 있는 클라우드 서비스 입니다.
@@ -63,7 +65,7 @@
                 <p>드라이브 생성중 입니다. 잠시 기다려주세요.</p>
             </div>
             <div v-if="step==2">
-                <div class="popup_close_button x_button" onClick="popupClose(this.parentElement.parentElement)"></div>
+                <div class="popup_close_button x_button" onClick="popupClose(this.parentElement.parentElement);$('.dim.no_popup_close').classList.remove('on');"></div>
                 <h2>성공</h2>
                 <p>드라이브 생성에 성공하였습니다.</p>
             </div>

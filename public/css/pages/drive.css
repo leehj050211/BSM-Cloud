@@ -9,6 +9,17 @@ main{
 #file_section{
     width:100%;
     display:inline-block;
+    overflow:auto;
+}
+#file_section::-webkit-scrollbar{
+    width:.8rem;
+}
+#file_section::-webkit-scrollbar-thumb{
+    background-color:rgb(192,192,192);
+    border-radius:10px;    
+}
+#file_section::-webkit-scrollbar-track{
+    background-color:rgba(0,0,0,0);
 }
 #files {
     display:grid;
@@ -82,22 +93,20 @@ main{
         min-width:30rem;
     }
 }
+#file_menu{
+    padding:2rem;
+}
 /* file info end */
 
 @media screen and (min-width:0px) and (max-width:720px){
     main{
         flex-direction:column;
     }
-    #file_section{
-        height:70%;
-        overflow:auto;
-    }
     #files{
         margin-bottom:1rem;
     }
     #file_info_bar{
         width:100%;
-        height:30%;
     }
 }
 

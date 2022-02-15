@@ -46,32 +46,32 @@ const instance = axios.create({
     headers:{'Pragma':'no-cache'},
     timeout:3000,
 })
-const ajax = async ({method, url, payload, callBack, errorCallBack}) => {
+const ajax = async ({method, url, payload, config, callBack, errorCallBack}) => {
     $('.loading').classList.add("on");
     let res
     try{
         const get = async () => {
             switch (method){
                 case 'get':
-                    return await instance.get(url, payload)
+                    return await instance.get(url, config)
                 case 'post':
-                    return await instance.post(url, payload)
+                    return await instance.post(url, payload, config)
                 case 'put':
-                    return await instance.put(url, payload)
+                    return await instance.put(url, payload, config)
                 case 'delete':
-                    return await instance.delete(url, payload)
+                    return await instance.delete(url, config)
             }
         }
         res = await get(method)
         res = res.data
     }catch(err){
-        console.log(err)
+        console.log(err.response)
         loadingInit()
         if(err.response){
             if(errorCallBack && errorCallBack(err.response.data)){
                 return;
             }
-            showAlert(`에러코드: ${err.response.data.statusCode} ${err.response.data.message}`)
+            showAlert(`에러코드: ${err.response.status} ${err.response.statusText}`)
         }else{
             showAlert(err)
         }
