@@ -48,46 +48,58 @@ const instance = axios.create({
 })
 const ajax = async ({method, url, payload, config, callBack, errorCallBack}) => {
     $('.loading').classList.add("on");
-    let res
+    let res;
     try{
         const get = async () => {
             switch (method){
                 case 'get':
-                    return await instance.get(url, config)
+                    return await instance.get(url, config);
                 case 'post':
-                    return await instance.post(url, payload, config)
+                    return await instance.post(url, payload, config);
                 case 'put':
-                    return await instance.put(url, payload, config)
+                    return await instance.put(url, payload, config);
                 case 'delete':
-                    return await instance.delete(url, config)
+                    return await instance.delete(url, config);
             }
         }
-        res = await get(method)
-        res = res.data
+        res = await get(method);
+        res = res.data;
     }catch(err){
-        console.log(err.response)
-        loadingInit()
-        if(err.response){
-            if(errorCallBack && errorCallBack(err.response.data)){
-                return;
-            }
-            showAlert(`에러코드: ${err.response.status} ${err.response.statusText}`)
-        }else{
-            showAlert(err)
+        console.log(err);
+        loadingInit();
+        if(!err.response){
+            showAlert(err);
+            return;
         }
+        if(!err.response.data){
+            showAlert(`HTTP ERROR ${err.response.status}`);
+            return;
+        }
+        if(!err.response.data.statusCode){
+            if(err.response.status==413){
+                showAlert(`HTTP ERROR ${err.response.status} 파일 크기가 너무 큽니다.`);
+            }else{
+                showAlert(`HTTP ERROR ${err.response.status}`);
+            }
+            return;
+        }
+        if(errorCallBack && errorCallBack(err.response.data)){
+            return;
+        }
+        showAlert(`에러코드: ${err.response.data.statusCode} ${err.response.data.message}`);
         return;
     }
     try{
-        callBack(res)
+        callBack(res);
     }catch(err) {
-        console.log(err)
-        loadingInit()
-        showAlert('알 수 없는 에러가 발생하였습니다')
+        console.log(err);
+        loadingInit();
+        showAlert('알 수 없는 에러가 발생하였습니다');
         return;
     }
-    loadingInit()
+    loadingInit();
 }
 const loadingInit = () => {
     $('.loading').classList.remove("on");
-    progress(100)
+    progress(100);
 }

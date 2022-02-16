@@ -9,6 +9,7 @@ main{
 #file_section{
     width:100%;
     display:inline-block;
+    position:relative;
     overflow:auto;
 }
 #file_section::-webkit-scrollbar{
@@ -98,20 +99,8 @@ main{
 }
 /* file info end */
 
-@media screen and (min-width:0px) and (max-width:720px){
-    main{
-        flex-direction:column;
-    }
-    #files{
-        margin-bottom:1rem;
-    }
-    #file_info_bar{
-        width:100%;
-    }
-}
-
 #file_upload{
-    position:fixed;
+    position:absolute;
     bottom:2rem;
     left:2rem;
     transition:.25s;
@@ -132,4 +121,26 @@ main{
     position:fixed;
     opacity:0;
     pointer-events:none;
+}
+
+@media screen and (min-width:0px) and (max-width:720px){
+    main{
+        flex-direction:column;
+        justify-content:space-between;
+    }
+    #file_section{
+        flex:1;
+    }
+    #files{
+        margin-bottom:1rem;
+    }
+    #file_info_bar{
+        width:100%;
+        height:auto;
+        flex:none;
+    }
+    #file_upload{
+        left:auto;
+        right:2rem;
+    }
 }

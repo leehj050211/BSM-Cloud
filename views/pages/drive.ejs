@@ -23,6 +23,10 @@
                     </div>
                 </li>
             </ul>
+            <label id="file_upload" for="file" class="clear_button">
+                <input id="file" type="file" onchange="uploadFile(this.files[0]);this.value=''">
+                <div></div>
+            </label>
         </section>
         <aside id="file_info_bar">
             <div id="file_top_bar">
@@ -37,10 +41,6 @@
                 <button class="button main_button" :onclick="`downloadFile('${file.fileId}')`">파일 다운로드</button>
             </div>
         </aside>
-        <label id="file_upload" for="file" class="clear_button">
-            <input id="file" type="file" onchange="uploadFile(this.files[0]);this.value=''">
-            <div></div>
-        </label>
     </main>
     <div>
         <div id="create_drive_box" class="popup main center">
