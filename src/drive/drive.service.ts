@@ -65,8 +65,10 @@ export class DriveService {
         if(inputDriveId !== driveId){
             throw new BadRequestException(`Drive doesn't match`);
         }
+        const total = result.total;
+        const used = result.used;
 
-        const fileList = (await this.fileRepository.getFileList(driveId)).map(file => {
+        const files = (await this.fileRepository.getFileList(driveId)).map(file => {
             return {
                 fileId: file.fileId.toString('hex'),
                 fileName: file.originalName,
@@ -74,7 +76,11 @@ export class DriveService {
                 size: file.size
             }
         })
-        return fileList;
+        return {
+            files,
+            total,
+            used
+        };
     }
 
     async downloadFile(usercode: number, DownloadFileDto: DownloadFileDto) {

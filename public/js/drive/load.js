@@ -1,4 +1,12 @@
 let driveId;
+
+const formatBytes = bytes => {
+    if(bytes === 0) return '0 bytes';
+    const sizes = ['bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return `${parseFloat((bytes / Math.pow(1024, i)).toFixed(2))} ${sizes[i]}`;
+}
+
 const filesView = Vue.createApp({
     data() {
         return {
@@ -6,7 +14,6 @@ const filesView = Vue.createApp({
         }
     }
 }).mount('#file_section #files');
-
 const fileInfoView = Vue.createApp({
     data() {
         return {
@@ -14,7 +21,16 @@ const fileInfoView = Vue.createApp({
                 fileName: '',
                 fileId: '',
                 created: ''
+            },
+            drive: {
+                total: 0,
+                used: 0
             }
+        }
+    },
+    methods: {
+        formatBytes: function(bytes){
+            return formatBytes(bytes)
         }
     }
 }).mount('#file_info_bar');
@@ -41,7 +57,8 @@ const loadDriveId = () => {
                 return true;
             }
             if(data.statusCode==404){
-                popupOpen($('#create_drive_box'));
+                $('.dim.no_popup_close').classList.add('on');
+                $('#create_drive_box').classList.add('on');
                 return true;
             }
         }
@@ -54,7 +71,12 @@ const loadFiles = () => {
         method: 'get',
         url: `drive/${driveId}`,
         callBack: data => {
-            filesView.files = data;
+            $('#total_used_bar div').style.width = `${(data.used/data.total)*100}%`;
+            filesView.files = data.files;
+            fileInfoView.drive = {
+                total: data.total,
+                used: data.used
+            }
         }
     })
 }

@@ -156,11 +156,6 @@ span{
 .logo img{
   height:5rem; padding:1.2rem; filter:var(--bright);
 }
-.overlay-fadein{
-  pointer-events:none;position:fixed; left:0; top:0; z-index:999; width:100%; height:100%; background:var(--black);
-  animation:fadein 500ms ease-out;
-  opacity:0;
-}
 .dim{
   position:fixed; left:0; top:0; z-index:97; width:100%; height:100%;
   display:none;

@@ -23,22 +23,29 @@
                     </div>
                 </li>
             </ul>
+        </section>
+        <aside id="file_info_bar">
             <label id="file_upload" for="file" class="clear_button">
                 <input id="file" type="file" onchange="uploadFile(this.files[0]);this.value=''">
                 <div></div>
             </label>
-        </section>
-        <aside id="file_info_bar">
             <div id="file_top_bar">
                 <h2 v-if="file.fileName">{{file.fileName}}</h2>
                 <h2 v-if="!file.fileName">선택된 파일 없음</h2>
             </div>
             <div id="file_info" v-if="file.fileId">
                 <p>파일 ID: {{file.fileId}}</p>
+                <p>파일 크기: {{formatBytes(file.size)}}</p>
                 <p>수정된 날짜: {{new Date(file.created).toLocaleString()}}</p>
             </div>
             <div id="file_menu" v-if="file.fileId">
                 <button class="button main_button" :onclick="`downloadFile('${file.fileId}')`">파일 다운로드</button>
+            </div>
+            <div id="drive_info">
+                <div id="total_used_bar">
+                    <div></div>
+                </div>
+                <p>드라이브 전체 {{formatBytes(drive.total)}} 중 {{formatBytes(drive.used)}} 사용 중</p>
             </div>
         </aside>
     </main>
