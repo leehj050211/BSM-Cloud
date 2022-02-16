@@ -32,4 +32,11 @@ export class File {
 
     @Column({nullable: false})
     created: Date;
+
+    @Column({
+        type: 'int',
+        unsigned: true,
+        nullable: false
+    })
+    size: number;
 }

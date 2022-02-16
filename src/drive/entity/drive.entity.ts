@@ -13,4 +13,18 @@ export class Drive {
 
     @Column({nullable: false})
     usercode: number;
+
+    @Column({
+        type: 'int',
+        unsigned: true,
+        nullable: false
+    })
+    total: number;
+
+    @Column({
+        type: 'int',
+        unsigned: true,
+        nullable: false
+    })
+    used: number;
 }

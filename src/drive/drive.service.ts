@@ -22,7 +22,9 @@ export class DriveService {
     ) {}
 
     async createDrive(usercode: number){
-        const drive = await this.driveRepository.createDrive(usercode);
+        // 1.5GB
+        const totalStorage = 1610612736;
+        const drive = await this.driveRepository.createDrive(usercode, totalStorage);
         const driveId: string = drive.id.toString('hex');
 
         try{
@@ -36,15 +38,19 @@ export class DriveService {
         return;
     }
 
-    async getDriveId(usercode: number) {
+    async getDrive(usercode: number) {
         const result = await this.driveRepository.getDriveByUsercode(usercode);
         if(!result){
             throw new NotFoundException('Drive not found');
         }
 
         const driveId = result.id.toString('hex');
+        const total = result.total;
+        const used = result.used;
         return {
-            driveId: driveId
+            driveId,
+            total,
+            used
         }
     }
 
@@ -64,7 +70,8 @@ export class DriveService {
             return {
                 fileId: file.fileId.toString('hex'),
                 fileName: file.originalName,
-                created: file.created
+                created: file.created,
+                size: file.size
             }
         })
         return fileList;
@@ -88,7 +95,8 @@ export class DriveService {
         }
         return {
             originalName: file.originalName,
-            fileName: file.fileName.toString('hex')
+            fileName: file.fileName.toString('hex'),
+            size: file.size
         };
     }
 
@@ -103,12 +111,25 @@ export class DriveService {
         if(inputDriveId !== driveId){
             throw new BadRequestException(`Drive doesn't match`);
         }
+        const fileSize = parseInt(inputFile.size);
+        const totalUsed = result.used + fileSize;
+        if(totalUsed > result.total){
+            try{
+                fs.promises.rm(inputFile.path); 
+            }catch (error){
+                console.error(error)
+            }
+            throw new BadRequestException('No more storage space');
+        }
 
-        const file = await this.fileRepository.uploadFile(driveId, usercode, inputFile.originalname, inputFile.filename, new Date());
+        const file = await this.fileRepository.uploadFile(driveId, usercode, inputFile.originalname, inputFile.filename, new Date(), fileSize);
         const fileId: string = file.fileId.toString('hex')
 
         try{
-            await fs.promises.rename(inputFile.path, `${__dirname}/../public/drive/${driveId}/${inputFile.filename}`); 
+            await Promise.all([
+                this.driveRepository.updateTotalUsed(driveId, totalUsed),
+                fs.promises.rename(inputFile.path, `${__dirname}/../public/drive/${driveId}/${inputFile.filename}`)
+            ])
         }catch (error){
             console.error(error)
             throw new InternalServerErrorException('Failed to upload file');
@@ -139,6 +160,16 @@ export class DriveService {
         }
         const oldFileName = file.fileName.toString('hex');
         const newFileName = inputFile.filename;
+        const newFileSize = parseInt(inputFile.size);
+        const totalUsed = (result.used - file.size) + newFileSize;
+        if(totalUsed > result.total){
+            try{
+                fs.promises.rm(inputFile.path); 
+            }catch (error){
+                console.error(error)
+            }
+            throw new BadRequestException('No more storage space');
+        }
 
         // update file
         try{
@@ -147,9 +178,12 @@ export class DriveService {
             console.error(error)
             throw new InternalServerErrorException('Failed to update file');
         }
-        await this.fileRepository.updateFile(inputFileId, inputFile.originalname, newFileName, new Date());
         try{
-            await fs.promises.rm(`${__dirname}/../public/drive/${driveId}/${oldFileName}`); 
+            await Promise.all([
+                this.driveRepository.updateTotalUsed(driveId, totalUsed),
+                this.fileRepository.updateFile(inputFileId, inputFile.originalname, newFileName, new Date(), newFileSize),
+                fs.promises.rm(`${__dirname}/../public/drive/${driveId}/${oldFileName}`)
+            ])
         }catch (error){
             console.error(error)
             throw new InternalServerErrorException('Failed to update file');
@@ -175,6 +209,7 @@ export class DriveService {
             throw new NotFoundException('File not found');
         }
         const fileName = file.fileName.toString('hex');
+        const totalUsed = result.used - file.size;
 
         // delete file
         await this.fileRepository.deleteFile(inputFileId);
@@ -184,6 +219,7 @@ export class DriveService {
             console.error(error)
             throw new InternalServerErrorException('Failed to delete file');
         }
+        this.driveRepository.updateTotalUsed(driveId, totalUsed);
         return;
     }
 }

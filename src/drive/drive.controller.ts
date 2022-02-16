@@ -22,8 +22,8 @@ export class DriveController {
     }
 
     @Get('')
-    getDriveId(@GetUser() user: User) {
-        return this.driveService.getDriveId(user.memberCode);
+    getDrive(@GetUser() user: User) {
+        return this.driveService.getDrive(user.memberCode);
     }
 
     @Get(':driveId')

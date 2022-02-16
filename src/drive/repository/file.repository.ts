@@ -30,7 +30,8 @@ export class FileRepository extends Repository<File> {
         usercode: number,
         originalName: string,
         fileName: string,
-        created: Date
+        created: Date,
+        fileSize: number
     ):Promise<File> {
         const fileId = getUuid().replaceAll('-', '');
         const file = this.create({
@@ -39,7 +40,8 @@ export class FileRepository extends Repository<File> {
             usercode: usercode,
             originalName: originalName,
             fileName: new Buffer(fileName, 'hex'),
-            created: created
+            created: created,
+            size: fileSize
         })
 
         try{
@@ -54,7 +56,8 @@ export class FileRepository extends Repository<File> {
         fileId: string,
         originalName: string,
         fileName: string,
-        created: Date
+        created: Date,
+        fileSize: number
     ):Promise<void> {
         try{
             this.update({
@@ -62,7 +65,8 @@ export class FileRepository extends Repository<File> {
             }, {
                 originalName: originalName,
                 fileName: new Buffer(fileName, 'hex'),
-                created: created
+                created: created,
+                size: fileSize
             })
         }catch(error){
             console.error(error)
