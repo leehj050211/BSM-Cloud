@@ -10,7 +10,8 @@ const formatBytes = bytes => {
 const filesView = Vue.createApp({
     data() {
         return {
-            files: []
+            files: [],
+            focus: -1
         }
     }
 }).mount('#file_section #files');
@@ -39,7 +40,6 @@ const loadDriveId = () => {
     progress(20);
     driveId = window.location.pathname.split('/')[2];
     if (driveId) {
-        history.pushState(null, null, `/drive/${driveId}`);
         loadFiles();
         return;
     }

@@ -40,6 +40,9 @@ main{
     transition:.25s;
     box-shadow:var(--shadow);
 }
+#files li.active{
+    background-color:var(--level-2);
+}
 @media screen and (min-width:0px) and (max-width:900px){
     #files li{
         max-width:100%;
@@ -94,6 +97,8 @@ main{
     }
 }
 #file_menu{
+    display:flex;
+    gap:1rem;
     padding:0 2rem;
 }
 
@@ -155,8 +160,8 @@ main{
         position:absolute;
         bottom:auto;
         left:auto;
-        top:-8rem;
-        right:2rem;
+        top:-7.5rem;
+        right:1.5rem;
     }
     #file_top_bar, #file_info, #drive_info{
         padding:1.5rem 2rem;

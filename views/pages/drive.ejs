@@ -14,7 +14,7 @@
     <main>
         <section id="file_section">
             <ul id="files">
-                <li v-for="(file, idx) in files" :onclick="`selectFile(${idx})`">
+                <li v-for="(file, idx) in files" :class="{active:focus==idx}" :onclick="`selectFile(${idx})`">
                     <div class="file_icon">
                         {{file.fileName.split('.')[file.fileName.split('.').length-1]}}
                     </div>
@@ -40,6 +40,7 @@
             </div>
             <div id="file_menu" v-if="file.fileId">
                 <button class="button main_button" :onclick="`downloadFile('${file.fileId}')`">파일 다운로드</button>
+                <button class="button sub_button red_button" :onclick="`deleteFile('${file.fileId}')`">삭제</button>
             </div>
             <div id="drive_info">
                 <div id="total_used_bar">

@@ -1,5 +1,6 @@
 const selectFile = fileIdx => {
-    fileInfoView.file = filesView.files[fileIdx]
+    filesView.focus = fileIdx;
+    fileInfoView.file = filesView.files[fileIdx];
 }
 
 const uploadFile = (file) => {
@@ -24,7 +25,7 @@ const uploadFile = (file) => {
                 }
             }
         },
-        callBack:data=>{
+        callBack:()=>{
             showToast('파일 업로드가 완료되었습니다.');
             loadFiles();
         }
@@ -37,7 +38,7 @@ const downloadFile = async (fileId) => {
         showToast('파일 다운로드 중입니다. 파일 크기에 따라 시간이 다소 소요될 수 있습니다.');
         const res = await axios({
             method:'get',
-            url:`/drive/${driveId}/${file.fileName}`,
+            url:`/storage/${driveId}/${file.fileName}`,
             responseType:'blob',
             onDownloadProgress: event => {
                 let percent = (event.loaded*100)/event.total;
@@ -72,5 +73,19 @@ const getFileDownloadInfo = (fileId) => {
                 resolve(data)
             }
         })
+    })
+}
+
+const deleteFile = async (fileId) => {
+    if(!confirm('정말 파일을 삭제하시겠습니까?')){
+        return;
+    }
+    ajax({
+        method:'delete',
+        url:`drive/${driveId}/${fileId}`,
+        callBack:()=>{
+            showToast("파일이 삭제되었습니다");
+            loadFiles();
+        }
     })
 }

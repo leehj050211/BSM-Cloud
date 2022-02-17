@@ -11,6 +11,8 @@ import { FileRepository } from './repository/file.repository';
 import * as fs from 'fs'
 import { v4 as getUuid } from 'uuid';
 
+const storagePath = `${__dirname}/${process.env.STORAGE_PATH}`;
+
 @Injectable()
 export class DriveService {
 
@@ -28,7 +30,7 @@ export class DriveService {
         const driveId: string = drive.id.toString('hex');
 
         try{
-            await fs.promises.mkdir(`${__dirname}/../public/drive/${driveId}`); 
+            await fs.promises.mkdir(`${storagePath}/${driveId}`); 
         }catch(error){
             console.error(error);
             throw new InternalServerErrorException('Failed to create drive');
@@ -134,7 +136,7 @@ export class DriveService {
         try{
             await Promise.all([
                 this.driveRepository.updateTotalUsed(driveId, totalUsed),
-                fs.promises.rename(inputFile.path, `${__dirname}/../public/drive/${driveId}/${inputFile.filename}`)
+                fs.promises.rename(inputFile.path, `${storagePath}/${driveId}/${inputFile.filename}`)
             ])
         }catch (error){
             console.error(error)
@@ -179,7 +181,7 @@ export class DriveService {
 
         // update file
         try{
-            await fs.promises.rename(inputFile.path, `${__dirname}/../public/drive/${driveId}/${newFileName}`); 
+            await fs.promises.rename(inputFile.path, `${storagePath}/${driveId}/${newFileName}`); 
         }catch (error){
             console.error(error)
             throw new InternalServerErrorException('Failed to update file');
@@ -188,7 +190,7 @@ export class DriveService {
             await Promise.all([
                 this.driveRepository.updateTotalUsed(driveId, totalUsed),
                 this.fileRepository.updateFile(inputFileId, inputFile.originalname, newFileName, new Date(), newFileSize),
-                fs.promises.rm(`${__dirname}/../public/drive/${driveId}/${oldFileName}`)
+                fs.promises.rm(`${storagePath}/${driveId}/${oldFileName}`)
             ])
         }catch (error){
             console.error(error)
@@ -220,7 +222,7 @@ export class DriveService {
         // delete file
         await this.fileRepository.deleteFile(inputFileId);
         try{
-            await fs.promises.rm(`${__dirname}/../public/drive/${driveId}/${fileName}`); 
+            await fs.promises.rm(`${storagePath}/${driveId}/${fileName}`); 
         }catch (error){
             console.error(error)
             throw new InternalServerErrorException('Failed to delete file');

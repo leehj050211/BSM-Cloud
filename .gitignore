@@ -1,4 +1,8 @@
 .env
+public/js/lib
+public/resource
+public/storage
+public/ie.html
 
 # compiled output
 /dist

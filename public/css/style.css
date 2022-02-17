@@ -99,10 +99,6 @@ body{
   font-weight:bold;
   src:url('/resource/common/font/NotoSansKR-Bold.woff2') format('woff2');
 }
-@keyframes fadein {
-  from {opacity:1;display:block;}
-  to {opacity:0;display:none;}
-}
 footer{
   padding:1.5rem 0; bottom:0; width:100%; font-size:1.5rem; text-align:center; font-weight:bold;
   background-color:var(--gray);
@@ -380,6 +376,10 @@ input[type=number]{
 }
 .main_button{
   width:100%;
+  flex:1;
+}
+.red_button{
+  background-color:var(--red) !important;
 }
 .icon object{
   pointer-events:none;
