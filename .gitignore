@@ -3,6 +3,7 @@ public/js/lib
 public/resource
 public/storage
 public/ie.html
+storage
 
 # compiled output
 /dist

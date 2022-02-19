@@ -35,12 +35,11 @@ const uploadFile = (file, fileId) => {
 }
 
 const downloadFile = async (fileId) => {
-    const file = await getFileDownloadInfo(fileId);
     try{
         showToast('다운로드 중입니다. 파일 크기에 따라 시간이 다소 소요될 수 있습니다.');
         const res = await axios({
             method:'get',
-            url:`/storage/${driveId}/${file.fileName}`,
+            url:`/api/drive/${driveId}/${fileId}`,
             responseType:'blob',
             onDownloadProgress: event => {
                 let percent = (event.loaded*100)/event.total;
@@ -51,10 +50,11 @@ const downloadFile = async (fileId) => {
                 }
             }
         });
+        const filename = res.headers["content-disposition"].split("filename=")[1].replace(/"/g, "");
         const fileUrl = window.URL.createObjectURL(new Blob([res.data], {type:res.headers['content-type']}));
         const link = document.createElement('a');
         link.href = fileUrl;
-        link.setAttribute('download', file.originalName);
+        link.setAttribute('download', filename);
         document.body.appendChild(link);
         link.click();
         delete link;
@@ -64,18 +64,6 @@ const downloadFile = async (fileId) => {
        showAlert('다운로드중 문제가 발생하였습니다');
        progress(100);
     }
-}
-
-const getFileDownloadInfo = (fileId) => {
-    return new Promise(resolve => {
-        ajax({
-            method:'get',
-            url:`drive/${driveId}/${fileId}`,
-            callBack:data=>{
-                resolve(data)
-            }
-        })
-    })
 }
 
 const deleteFile = async (fileId) => {

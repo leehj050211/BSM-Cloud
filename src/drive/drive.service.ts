@@ -9,7 +9,7 @@ import { DriveRepository } from './repository/drive.repository';
 import { FileRepository } from './repository/file.repository';
 
 import * as fs from 'fs'
-import { v4 as getUuid } from 'uuid';
+import { Response } from 'express';
 
 const storagePath = `${__dirname}/${process.env.STORAGE_PATH}`;
 
@@ -85,7 +85,7 @@ export class DriveService {
         };
     }
 
-    async downloadFile(usercode: number, DownloadFileDto: DownloadFileDto) {
+    async downloadFile(res: Response, usercode: number, DownloadFileDto: DownloadFileDto) {
         const {driveId: inputDriveId, fileId: inputFileId} = DownloadFileDto;
         // driveId check
         const result = await this.driveRepository.getDriveByUsercode(usercode);
@@ -101,11 +101,13 @@ export class DriveService {
         if(!file){
             throw new NotFoundException('File not found');
         }
-        return {
-            originalName: file.originalName,
-            fileName: file.fileName.toString('hex'),
-            size: file.size
-        };
+
+        const stream = fs.createReadStream(`${storagePath}/${driveId}/${file.fileName.toString('hex')}`);
+        res.set({
+            'Content-Type': 'application/json',
+            'Content-Disposition': `attachment; filename="${file.originalName}"`,
+        });
+        return stream.pipe(res);
     }
 
     async uploadFile(usercode: number, UploadFilesDto: UploadFilesDto, inputFile) {

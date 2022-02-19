@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Param, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, Put, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { DriveService } from './drive.service';
 import { GetFileListDto } from './dto/getFileList.dto';
 import { UploadFilesDto } from './dto/uploadFile.dto';
@@ -10,6 +10,7 @@ import { GetUser } from 'src/auth/getUser.decorator';
 import { User } from 'src/auth/user.model';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileMulterOption } from './file.multerOption';
+import { Response } from 'express';
 
 @Controller('api/drive')
 @UseGuards(JwtAuthGuard)
@@ -36,10 +37,11 @@ export class DriveController {
     
     @Get(':driveId/:fileId')
     downloadFile(
+        @Res() res: Response,
         @GetUser() user: User,
         @Param() DownloadFileDto
     ) {
-        return this.driveService.downloadFile(user.memberCode, DownloadFileDto);
+        return this.driveService.downloadFile(res, user.memberCode, DownloadFileDto);
     }
 
     @UseInterceptors(FileInterceptor('file', FileMulterOption))
