@@ -1,32 +1,34 @@
 const selectFile = fileIdx => {
-    filesView.focus = fileIdx;
+    filesView.focus = filesView.files[fileIdx].fileId;
     fileInfoView.file = filesView.files[fileIdx];
 }
 
-const uploadFile = (file) => {
+const uploadFile = (file, fileId) => {
     if(!file){
         return;
     }
+    const url = !fileId? `drive/${driveId}`: `drive/${driveId}/${fileId}`;
+    const method = !fileId? 'post': 'put';
     let form = new FormData();
     form.append('file', file);
-    showToast('파일 업로드 중입니다. 파일 크기에 따라 시간이 다소 소요될 수 있습니다.');
+    showToast('업로드 중입니다. 파일 크기에 따라 시간이 다소 소요될 수 있습니다.');
     ajax({
-        method:'post',
+        method:method,
         payload:form,
-        url:`drive/${driveId}`,
+        url:url,
         config:{
             timeout:0,
             onUploadProgress: event => {
                 let percent = (event.loaded*100)/event.total;
                 if(percent==100){
-                    showToast('파일 업로드 완료. 준비 중입니다 잠시 기다려주세요.');
+                    showToast('업로드 완료. 준비 중입니다 잠시 기다려주세요.');
                 }else{
                     progress(percent);
                 }
             }
         },
         callBack:()=>{
-            showToast('파일 업로드가 완료되었습니다.');
+            showToast('업로드가 완료되었습니다.');
             loadFiles();
         }
     })
@@ -35,7 +37,7 @@ const uploadFile = (file) => {
 const downloadFile = async (fileId) => {
     const file = await getFileDownloadInfo(fileId);
     try{
-        showToast('파일 다운로드 중입니다. 파일 크기에 따라 시간이 다소 소요될 수 있습니다.');
+        showToast('다운로드 중입니다. 파일 크기에 따라 시간이 다소 소요될 수 있습니다.');
         const res = await axios({
             method:'get',
             url:`/storage/${driveId}/${file.fileName}`,
@@ -43,7 +45,7 @@ const downloadFile = async (fileId) => {
             onDownloadProgress: event => {
                 let percent = (event.loaded*100)/event.total;
                 if(percent==100){
-                    showToast('파일 다운로드 완료. 준비 중입니다 잠시 기다려주세요.');
+                    showToast('다운로드 완료. 준비 중입니다 잠시 기다려주세요.');
                 }else{
                     progress(percent);
                 }
@@ -59,7 +61,7 @@ const downloadFile = async (fileId) => {
         progress(100);
     }catch(err){
        console.error(err);
-       showAlert('파일 다운로드중 문제가 발생하였습니다');
+       showAlert('다운로드중 문제가 발생하였습니다');
        progress(100);
     }
 }
@@ -86,6 +88,12 @@ const deleteFile = async (fileId) => {
         callBack:()=>{
             showToast("파일이 삭제되었습니다");
             loadFiles();
+            filesView.focus = -1;
+            fileInfoView.file = {
+                fileName: '',
+                fileId: '',
+                created: ''
+            }
         }
     })
 }

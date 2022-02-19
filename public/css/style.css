@@ -65,7 +65,7 @@ a, abbr, acronym, address, applet, article, aside, audio, b, big, blockquote, bo
 }
 html{
   font-size:62.5%; height:100%;
-  /* 10rem == 1px */
+  /* 1rem == 10px */
   scroll-behavior:smooth;
   height: calc(var(--vh, 1vh) * 100);
   overflow:auto;
@@ -76,13 +76,15 @@ html::-webkit-scrollbar{
 }
 html::-webkit-scrollbar-thumb{
   background-color:rgb(192,192,192);
-  border-radius:10px;    
+  border-radius:1rem;    
 }
 html::-webkit-scrollbar-track{
   background-color:rgba(0,0,0,0);
 }
 body{
-  background-color:var(--background); color:var(--text); font-size:1.5rem; font-family:NotoSans,-apple-system,BlinkMacSystemFont,'Malgun Gothic','맑은고딕',helvetica,'Apple SD Gothic Neo',sans-serif;
+  background-color:var(--background);
+  color:var(--text);
+  font-size:1.5rem;
   background-position:center;
   background-repeat:no-repeat;
   background-attachment:fixed;
@@ -336,7 +338,7 @@ input[type=number]{
 .input_file .file_name{
   width:15rem;
 }
-.input_file input[type=file]{
+input[type=file]{
   position:fixed;
   opacity:0;
   pointer-events:none;

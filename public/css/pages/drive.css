@@ -139,11 +139,6 @@ main{
     transform:rotate(-45deg);
     filter:var(--bright);
 }
-#file_upload input{
-    position:fixed;
-    opacity:0;
-    pointer-events:none;
-}
 
 @media screen and (min-width:0px) and (max-width:720px){
     main{
