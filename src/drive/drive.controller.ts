@@ -45,7 +45,7 @@ export class DriveController {
     }
 
     @UseInterceptors(FileInterceptor('file', FileMulterOption))
-    @Post(':driveId')
+    @Post('upload/:driveId')
     uploadFile(
         @GetUser() user: User,
         @Param() UploadFilesDto,

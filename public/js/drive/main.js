@@ -7,7 +7,7 @@ const uploadFile = (file, fileId) => {
     if(!file){
         return;
     }
-    const url = !fileId? `drive/${driveId}`: `drive/${driveId}/${fileId}`;
+    const url = !fileId? `drive/upload/${driveId}`: `drive/upload/${driveId}/${fileId}`;
     const method = !fileId? 'post': 'put';
     let form = new FormData();
     form.append('file', file);

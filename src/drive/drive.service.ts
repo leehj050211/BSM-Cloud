@@ -102,10 +102,13 @@ export class DriveService {
             throw new NotFoundException('File not found');
         }
 
-        const stream = fs.createReadStream(`${storagePath}/${driveId}/${file.fileName.toString('hex')}`);
+        const filepath = `${storagePath}/${driveId}/${file.fileName.toString('hex')}`;
+        const fileStat = await fs.promises.stat(filepath);
+        const stream = fs.createReadStream(filepath);
         res.set({
             'Content-Type': 'application/json',
             'Content-Disposition': `attachment; filename="${file.originalName}"`,
+            'Content-Length': fileStat.size,
         });
         return stream.pipe(res);
     }
