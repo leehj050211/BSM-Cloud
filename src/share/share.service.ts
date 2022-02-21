@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FileRepository } from 'src/drive/repository/file.repository';
 
@@ -16,7 +16,7 @@ export class ShareService {
     ) {}
     
     async getFileInfo(fileId: string) {
-        const file = await this.fileRepository.getFile(fileId);
+        const file = await this.fileRepository.getFileByFileId(fileId);
         if(!file || !file.isShare){
             throw new NotFoundException('File not found');
         }
@@ -28,13 +28,23 @@ export class ShareService {
     }
 
     async downlaodFile(res: Response, fileId: string) {
-        const file = await this.fileRepository.getFile(fileId);
+        const file = await this.fileRepository.getFileByFileId(fileId);
         if(!file || !file.isShare){
             throw new NotFoundException('File not found');
         }
 
         const filepath = `${storagePath}/${file.driveId.toString('hex')}/${file.fileName.toString('hex')}`;
-        const fileStat = await fs.promises.stat(filepath);
+        let fileStat;
+        try{
+            fileStat = await fs.promises.stat(filepath);
+        }catch(err){
+            console.error(err);
+            if(err.code=='ENOENT'){
+                throw new NotFoundException('Original file not found');
+            }else{
+                throw new InternalServerErrorException();
+            }
+        }
         const stream = fs.createReadStream(filepath);
         res.set({
             'Content-Type': 'application/json',

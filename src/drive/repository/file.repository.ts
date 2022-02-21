@@ -7,11 +7,22 @@ import { InternalServerErrorException } from "@nestjs/common";
 @EntityRepository(File)
 export class FileRepository extends Repository<File> {
 
-    async getFile(
+    async getFileByFileId(
         fileId: string
     ):Promise<File> {
         const file = this.findOne({
             fileId: new Buffer(fileId, 'hex')
+        })
+        return file;
+    }
+
+    async getFileByFileIdAndDriveId(
+        fileId: string,
+        driveId: string
+    ):Promise<File> {
+        const file = this.findOne({
+            fileId: new Buffer(fileId, 'hex'),
+            driveId: new Buffer(driveId, 'hex')
         })
         return file;
     }

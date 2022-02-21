@@ -94,13 +94,23 @@ export class DriveService {
             throw new BadRequestException(`Drive doesn't match`);
         }
 
-        const file = (await this.fileRepository.getFile(inputFileId));
+        const file = await this.fileRepository.getFileByFileIdAndDriveId(inputFileId, driveId);
         if(!file){
             throw new NotFoundException('File not found');
         }
 
         const filepath = `${storagePath}/${driveId}/${file.fileName.toString('hex')}`;
-        const fileStat = await fs.promises.stat(filepath);
+        let fileStat;
+        try{
+            fileStat = await fs.promises.stat(filepath);
+        }catch(err){
+            console.error(err);
+            if(err.code=='ENOENT'){
+                throw new NotFoundException('Original file not found');
+            }else{
+                throw new InternalServerErrorException();
+            }
+        }
         const stream = fs.createReadStream(filepath);
         res.set({
             'Content-Type': 'application/json',
@@ -164,7 +174,7 @@ export class DriveService {
         }
 
         // file check
-        const file = (await this.fileRepository.getFile(inputFileId));
+        const file = await this.fileRepository.getFileByFileIdAndDriveId(inputFileId, driveId);
         if(!file){
             throw new NotFoundException('File not found');
         }
@@ -214,7 +224,7 @@ export class DriveService {
         }
 
         // file check
-        const file = (await this.fileRepository.getFile(inputFileId));
+        const file = await this.fileRepository.getFileByFileIdAndDriveId(inputFileId, driveId);
         if(!file){
             throw new NotFoundException('File not found');
         }
@@ -247,7 +257,7 @@ export class DriveService {
         }
 
         // file check
-        const file = (await this.fileRepository.getFile(inputFileId));
+        const file = await this.fileRepository.getFileByFileIdAndDriveId(inputFileId, driveId);
         if(!file){
             throw new NotFoundException('File not found');
         }
