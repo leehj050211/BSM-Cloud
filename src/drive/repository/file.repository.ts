@@ -41,7 +41,8 @@ export class FileRepository extends Repository<File> {
             originalName: originalName,
             fileName: new Buffer(fileName, 'hex'),
             created: created,
-            size: fileSize
+            size: fileSize,
+            isShare: false
         })
 
         try{
@@ -80,6 +81,22 @@ export class FileRepository extends Repository<File> {
         try{
             await this.delete({
                 fileId: new Buffer(fileId, 'hex'),
+            })
+        }catch(error){
+            console.error(error)
+            throw new InternalServerErrorException();
+        }
+    }
+
+    async shareFile(
+        fileId: string,
+        share: boolean,
+    ):Promise<void> {
+        try{
+            this.update({
+                fileId: new Buffer(fileId, 'hex')
+            }, {
+                isShare: share
             })
         }catch(error){
             console.error(error)

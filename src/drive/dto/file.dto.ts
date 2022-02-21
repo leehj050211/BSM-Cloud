@@ -1,4 +1,4 @@
-export class UpdateFileDto {
+export class FileDto {
     driveId: string;
     fileId: string;
 }

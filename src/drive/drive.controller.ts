@@ -1,10 +1,7 @@
-import { Controller, Delete, Get, Param, Post, Put, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseBoolPipe, Post, Put, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { DriveService } from './drive.service';
-import { GetFileListDto } from './dto/getFileList.dto';
-import { UploadFilesDto } from './dto/uploadFile.dto';
-import { DownloadFileDto } from './dto/downloadFile.dto';
-import { UpdateFileDto } from './dto/updateFile.dto';
-import { DeleteFileDto } from './dto/deleteFile.dto';
+import { DriveDto } from './dto/drive.dto';
+import { FileDto } from './dto/file.dto';
 import JwtAuthGuard from 'src/auth/auth.guard';
 import { GetUser } from 'src/auth/getUser.decorator';
 import { User } from 'src/auth/user.model';
@@ -30,45 +27,54 @@ export class DriveController {
     @Get(':driveId')
     getFileList(
         @GetUser() user: User,
-        @Param() GetFileListDto
+        @Param() DriveDto
     ) {
-        return this.driveService.getFileList(user.memberCode, GetFileListDto);
+        return this.driveService.getFileList(user.memberCode, DriveDto);
     }
     
     @Get(':driveId/:fileId')
     downloadFile(
         @Res() res: Response,
         @GetUser() user: User,
-        @Param() DownloadFileDto
+        @Param() FileDto
     ) {
-        return this.driveService.downloadFile(res, user.memberCode, DownloadFileDto);
+        return this.driveService.downloadFile(res, user.memberCode, FileDto);
     }
 
     @UseInterceptors(FileInterceptor('file', FileMulterOption))
     @Post('upload/:driveId')
     uploadFile(
         @GetUser() user: User,
-        @Param() UploadFilesDto,
+        @Param() DriveDto,
         @UploadedFile() inputFile
     ) {
-        return this.driveService.uploadFile(user.memberCode, UploadFilesDto, inputFile);
+        return this.driveService.uploadFile(user.memberCode, DriveDto, inputFile);
     }
 
     @UseInterceptors(FileInterceptor('file', FileMulterOption))
     @Put(':driveId/:fileId')
     updateFile(
         @GetUser() user: User,
-        @Param() UpdateFileDto,
+        @Param() FileDto,
         @UploadedFile() inputFile
     ) {
-        return this.driveService.updateFile(user.memberCode, UpdateFileDto, inputFile);
+        return this.driveService.updateFile(user.memberCode, FileDto, inputFile);
     }
 
     @Delete(':driveId/:fileId')
     deleteFile(
         @GetUser() user: User,
-        @Param() DeleteFileDto
+        @Param() FileDto
     ) {
-        return this.driveService.deleteFile(user.memberCode, DeleteFileDto);
+        return this.driveService.deleteFile(user.memberCode, FileDto);
+    }
+
+    @Post('share/:driveId/:fileId')
+    shareFile(
+        @GetUser() user: User,
+        @Param() FileDto,
+        @Body('share', ParseBoolPipe) share: boolean
+    ) {
+        return this.driveService.shareFile(user.memberCode, FileDto, share);
     }
 }

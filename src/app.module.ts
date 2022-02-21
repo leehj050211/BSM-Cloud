@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DriveModule } from './drive/drive.module';
 import { AuthModule } from './auth/auth.module';
 import { AppController } from './app.controller';
+import { ShareModule } from './share/share.module';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { AppController } from './app.controller';
       entities: [__dirname + '/**/entity/*.entity.{js,ts}']
     }),
     DriveModule,
-    AuthModule],
+    AuthModule,
+    ShareModule],
   controllers: [AppController],
   providers: [],
 })

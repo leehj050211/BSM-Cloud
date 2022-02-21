@@ -1,10 +1,7 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteFileDto } from './dto/deleteFile.dto';
-import { DownloadFileDto } from './dto/downloadFile.dto';
-import { GetFileListDto } from './dto/getFileList.dto';
-import { UpdateFileDto } from './dto/updateFile.dto';
-import { UploadFilesDto } from './dto/uploadFile.dto';
+import { FileDto } from './dto/file.dto';
+import { DriveDto } from './dto/drive.dto';
 import { DriveRepository } from './repository/drive.repository';
 import { FileRepository } from './repository/file.repository';
 
@@ -56,8 +53,8 @@ export class DriveService {
         }
     }
 
-    async getFileList(usercode: number, GetFilesDto: GetFileListDto) {
-        const {driveId: inputDriveId} = GetFilesDto;
+    async getFileList(usercode: number, driveDto: DriveDto) {
+        const {driveId: inputDriveId} = driveDto;
         // driveId check
         const result = await this.driveRepository.getDriveByUsercode(usercode);
         if(!result){
@@ -85,8 +82,8 @@ export class DriveService {
         };
     }
 
-    async downloadFile(res: Response, usercode: number, DownloadFileDto: DownloadFileDto) {
-        const {driveId: inputDriveId, fileId: inputFileId} = DownloadFileDto;
+    async downloadFile(res: Response, usercode: number, fileDto: FileDto) {
+        const {driveId: inputDriveId, fileId: inputFileId} = fileDto;
         // driveId check
         const result = await this.driveRepository.getDriveByUsercode(usercode);
         if(!result){
@@ -113,8 +110,8 @@ export class DriveService {
         return stream.pipe(res);
     }
 
-    async uploadFile(usercode: number, UploadFilesDto: UploadFilesDto, inputFile) {
-        const {driveId: inputDriveId} = UploadFilesDto;
+    async uploadFile(usercode: number, driveDto: DriveDto, inputFile) {
+        const {driveId: inputDriveId} = driveDto;
         // driveId check
         const result = await this.driveRepository.getDriveByUsercode(usercode);
         if(!result){
@@ -154,8 +151,8 @@ export class DriveService {
         };
     }
 
-    async updateFile(usercode: number, UpdateFileDto: UpdateFileDto, inputFile) {
-        const {driveId: inputDriveId, fileId: inputFileId} = UpdateFileDto;
+    async updateFile(usercode: number, fileDto: FileDto, inputFile) {
+        const {driveId: inputDriveId, fileId: inputFileId} = fileDto;
         // driveId check
         const result = await this.driveRepository.getDriveByUsercode(usercode);
         if(!result){
@@ -204,8 +201,8 @@ export class DriveService {
         return;
     }
 
-    async deleteFile(usercode: number, DeleteFileDto: DeleteFileDto) {
-        const {driveId: inputDriveId, fileId: inputFileId} = DeleteFileDto;
+    async deleteFile(usercode: number, fileDto: FileDto) {
+        const {driveId: inputDriveId, fileId: inputFileId} = fileDto;
         // driveId check
         const result = await this.driveRepository.getDriveByUsercode(usercode);
         if(!result){
@@ -233,6 +230,34 @@ export class DriveService {
             throw new InternalServerErrorException('Failed to delete file');
         }
         this.driveRepository.updateTotalUsed(driveId, totalUsed);
+        return;
+    }
+
+    async shareFile(usercode: number, fileDto: FileDto, share: boolean) {
+        console.log(share)
+        const {driveId: inputDriveId, fileId: inputFileId} = fileDto;
+        // driveId check
+        const result = await this.driveRepository.getDriveByUsercode(usercode);
+        if(!result){
+            throw new NotFoundException('Drive not found');
+        }
+        const driveId = result.id.toString('hex');
+        if(inputDriveId !== driveId){
+            throw new BadRequestException(`Drive doesn't match`);
+        }
+
+        // file check
+        const file = (await this.fileRepository.getFile(inputFileId));
+        if(!file){
+            throw new NotFoundException('File not found');
+        }
+
+        try{
+            await this.fileRepository.shareFile(inputFileId, share);
+        }catch (error){
+            console.error(error)
+            throw new InternalServerErrorException('Failed to share file');
+        }
         return;
     }
 }

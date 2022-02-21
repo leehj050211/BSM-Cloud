@@ -39,4 +39,7 @@ export class File {
         nullable: false
     })
     size: number;
+
+    @Column({nullable: false})
+    isShare: boolean;
 }
