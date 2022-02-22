@@ -34,9 +34,12 @@
                 <h2 v-if="!file.fileName">선택된 파일 없음</h2>
             </div>
             <div id="file_info" v-if="file.fileId">
-                <p>파일 ID: {{file.fileId}}</p>
                 <p>파일 크기: {{formatBytes(file.size)}}</p>
                 <p>수정된 날짜: {{new Date(file.created).toLocaleString()}}</p>
+                <details>
+                    <summary>파일 ID 보기</summary>
+                    <p>파일 ID: {{file.fileId}}</p>
+                </details>
             </div>
             <div id="file_menu" v-if="file.fileId">
                 <button class="button main_button" :onclick="`downloadFile('${file.fileId}')`">다운로드</button>

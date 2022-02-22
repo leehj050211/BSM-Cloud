@@ -166,4 +166,9 @@ main{
         height:auto;
         flex:none;
     }
+    .toast_wrap{
+        bottom:auto;
+        top:1rem;
+        flex-direction:column;
+    }
 }

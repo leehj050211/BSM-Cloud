@@ -8,8 +8,10 @@
     <meta property="og:description" content="BSM 클라우드 서비스">
     <link rel="stylesheet" type="text/css" href="/css/pages/home.css">
     <script>
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
         window.addEventListener('resize', () => {
-            let vh = window.innerHeight * 0.01;
+            vh = window.innerHeight * 0.01;
             document.documentElement.style.setProperty('--vh', `${vh}px`);
         });
     </script>
