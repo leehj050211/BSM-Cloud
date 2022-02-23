@@ -1,0 +1,30 @@
+<html lang="kr">
+<head>
+    <%- include('../common/head') %>
+    <title>BSM Cloud</title>
+    <meta property="title" content="공유 | BSM Cloud">
+    <meta property="description" content="공유 | BSM 클라우드 서비스">
+    <meta property="og:title" content="공유 | BSM Cloud">
+    <meta property="og:description" content="공유 | BSM 클라우드 서비스">
+    <link rel="stylesheet" type="text/css" href="/css/pages/share.css">
+    <script src="/js/common.js"></script>
+</head>
+<body>
+    <%- include('../common/common') %>
+    <main>
+        <div id="file_info">
+            <h2>{{file.fileName}}</h2>
+            <p>파일 크기: {{formatBytes(file.size)}}</p>
+            <p>수정된 날짜: {{new Date(file.created).toLocaleString()}}</p>
+            <div id="file_menu" v-if="file.fileId">
+                <button class="button" :onclick="`downloadFile('${file.fileId}')`">파일 다운로드</button>
+            </div>
+        </div>
+    </main>
+    <script src="/js/alert.js"></script>
+    <script src="/js/lib/axios.js"></script>
+    <script src="/js/ajax.js"></script>
+    <script src="/js/lib/vue.js"></script>
+    <script src="/js/share/main.js"></script>
+</body>
+</html>

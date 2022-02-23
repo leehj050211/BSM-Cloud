@@ -1,12 +1,5 @@
 let driveId;
 
-const formatBytes = bytes => {
-    if(bytes === 0) return '0 bytes';
-    const sizes = ['bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return `${parseFloat((bytes / Math.pow(1024, i)).toFixed(2))} ${sizes[i]}`;
-}
-
 const filesView = Vue.createApp({
     data() {
         return {
