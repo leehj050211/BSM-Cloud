@@ -10,7 +10,6 @@
     <script src="/js/common.js"></script>
 </head>
 <body>
-    <%- include('../common/common') %>
     <main>
         <section id="file_section">
             <ul id="files">
@@ -36,6 +35,8 @@
             <div id="file_info" v-if="file.fileId">
                 <p>파일 크기: {{formatBytes(file.size)}}</p>
                 <p>수정된 날짜: {{new Date(file.created).toLocaleString()}}</p>
+                <p v-if="!file.isShare">파일 공유: 비공개</p>
+                <p v-if="file.isShare">파일 공유: 공개</p>
                 <details>
                     <summary>파일 ID 보기</summary>
                     <p>파일 ID: {{file.fileId}}</p>
@@ -86,10 +87,7 @@
             </div>
         </div>
     </div>
-    <script src="/js/alert.js"></script>
-    <script src="/js/lib/axios.js"></script>
-    <script src="/js/ajax.js"></script>
-    <script src="/js/lib/vue.js"></script>
+    <%- include('../common/common') %>
     <script src="/js/drive/load.js"></script>
     <script src="/js/drive/main.js"></script>
 </body>

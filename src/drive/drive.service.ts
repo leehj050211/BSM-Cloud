@@ -72,7 +72,8 @@ export class DriveService {
                 fileId: file.fileId.toString('hex'),
                 fileName: file.originalName,
                 created: file.created,
-                size: file.size
+                size: file.size,
+                isShare: file.isShare
             }
         })
         return {

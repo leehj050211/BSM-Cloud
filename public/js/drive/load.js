@@ -14,7 +14,8 @@ const fileInfoView = Vue.createApp({
             file: {
                 fileName: '',
                 fileId: '',
-                created: ''
+                created: '',
+                isShare: false
             },
             drive: {
                 total: 0,
@@ -45,10 +46,6 @@ const loadDriveId = () => {
             loadFiles();
         },
         errorCallBack: data => {
-            if(data.statusCode==401){
-                showAlert('로그인이 필요합니다');
-                return true;
-            }
             if(data.statusCode==404){
                 $('.dim.no_popup_close').classList.add('on');
                 $('#create_drive_box').classList.add('on');

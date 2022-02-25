@@ -76,17 +76,25 @@ const ajax = async ({method, url, payload, config, callBack, errorCallBack}) => 
             return;
         }
         if(!err.response.data.statusCode){
-            if(err.response.status==413){
-                showAlert(`HTTP ERROR ${err.response.status} 파일 크기가 너무 큽니다.`);
-            }else{
-                showAlert(`HTTP ERROR ${err.response.status}`);
+            switch(err.response.status){
+                case 413:
+                    showAlert(`HTTP ERROR ${err.response.status} 파일 크기가 너무 큽니다.`);
+                    break;
+                default:
+                    showAlert(`HTTP ERROR ${err.response.status}`);
             }
             return;
         }
         if(errorCallBack && errorCallBack(err.response.data)){
             return;
         }
-        showAlert(`에러코드: ${err.response.data.statusCode} ${err.response.data.message}`);
+        switch(err.response.data.statusCode){
+            case 401:
+                popupOpen($('#login_box'));
+                break;
+            default:
+                showAlert(`에러코드: ${err.response.data.statusCode} ${err.response.data.message}`);
+        }
         return;
     }
     try{

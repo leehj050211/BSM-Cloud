@@ -15,14 +15,14 @@ const themeInit = () => {
         }else{
             $(':root').classList.remove('dark');
         }
+        return;
+    }
+    if(prefersDarkScheme.matches){
+        localStorage.setItem('theme', 'dark');
+        $(':root').classList.add('dark');
     }else{
-        if(prefersDarkScheme.matches){
-            localStorage.setItem('theme', 'dark');
-            $(':root').classList.add('dark');
-        }else{
-            localStorage.setItem('theme', 'light');
-            $(':root').classList.remove('dark');
-        }
+        localStorage.setItem('theme', 'light');
+        $(':root').classList.remove('dark');
     }
 }
 const toggleTheme = () => {
@@ -39,22 +39,44 @@ const toggleTheme = () => {
         localStorage.setItem('theme', 'dark');
     }
 }
-themeInit()
+themeInit();
 
-const popupOpen = (element) => {
-    if($('.dim.popup_close')){
+let popup = {
+    noPopupClose: false,
+
+    get noClose(){
+        return this.noPopupClose;
+    },
+    set noClose(flag){
+        this.noPopupClose = flag;
+        if(flag){
+            $('.dim.popup_close').classList.remove('on')
+            return;
+        }
         if($$('.popup.on').length<1){
             $('.dim.popup_close').classList.add('on')
         }
     }
+};
+const popupOpen = (element) => {
     element.classList.add('on')
+    if(!$('.dim.popup_close')){
+        return;
+    }
+    if(popup.noClose){
+        return;
+    }
+    if($$('.popup.on').length>=1){
+        $('.dim.popup_close').classList.add('on')
+    }
 }
 const popupClose = (element) => {
     element.classList.remove('on')
-    if($('.dim.popup_close')){
-        if($$('.popup.on').length<1){
-            $('.dim.popup_close').classList.remove('on')
-        }
+    if(!$('.dim.popup_close')){
+        return;
+    }
+    if($$('.popup.on').length<1){
+        $('.dim.popup_close').classList.remove('on')
     }
 }
 
