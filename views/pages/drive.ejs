@@ -44,12 +44,18 @@
             </div>
             <div id="file_menu" v-if="file.fileId">
                 <button class="button main_button" :onclick="`downloadFile('${file.fileId}')`">다운로드</button>
-                <label class="button sub_button" for="update_input">
-                    업데이트
-                    <input id="update_input" type="file" :onchange="`uploadFile(this.files[0], '${file.fileId}');this.value=''`">
-                </label>
-                <button class="button sub_button red_button" :onclick="`deleteFile('${file.fileId}')`">삭제</button>
+                <button class="button clear_button" onclick="$('#file_sub_menu').toggleAttribute('open')">더보기</button>
             </div>
+            <details id="file_sub_menu">
+                <summary></summary>
+                <div>
+                    <label class="button">
+                        업데이트
+                        <input type="file" :onchange="`uploadFile(this.files[0], '${file.fileId}');this.value=''`">
+                    </label>
+                    <button class="button red_button" :onclick="`deleteFile('${file.fileId}')`">삭제</button>
+                </div>
+            </details>
             <div id="drive_info">
                 <div id="total_used_bar">
                     <div></div>

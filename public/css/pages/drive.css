@@ -63,11 +63,24 @@ main{
     font-size:3rem;
 }
 .file_name{
-    display:flex;
-    align-items:center;
     width:100%;
     padding:1rem;
     background-color:var(--level-2);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+@media screen and (min-width:0px) and (max-width:600px){
+    #files{
+        grid-template-columns:repeat(auto-fill, minmax(15rem, 1fr));
+    }
+    #files li{
+        height:15rem;
+    }
+    .file_icon{
+        font-size:2.4rem;
+    }
 }
 /* file section end */
 
@@ -93,13 +106,27 @@ main{
 }
 @media screen and (min-width:0px) and (max-width:900px){
     #file_info_bar{
-        min-width:30rem;
+        min-width:35rem;
     }
 }
 #file_menu{
     display:flex;
     gap:1rem;
     padding:0 2rem;
+}
+#file_sub_menu{
+    padding:2rem 2rem 0 2rem;
+}
+#file_sub_menu:not([open]),
+#file_sub_menu summary{
+    display:none;
+}
+#file_sub_menu > div{
+    display:flex;
+    gap:1rem;
+}
+#file_sub_menu > div *{
+    flex:1;
 }
 
 #total_used_bar{
@@ -140,7 +167,8 @@ main{
     filter:var(--bright);
 }
 
-@media screen and (min-width:0px) and (max-width:720px){
+@media screen and (min-width:0px) and (max-width:780px) and
+(min-height:0px) and (min-height:500px){
     main{
         flex-direction:column;
         justify-content:space-between;

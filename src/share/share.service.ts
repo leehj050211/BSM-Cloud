@@ -47,7 +47,6 @@ export class ShareService {
         }
         const stream = fs.createReadStream(filepath);
         res.set({
-            'Content-Type': 'application/json',
             'Content-Disposition': `attachment; filename="${file.originalName}"`,
             'Content-Length': fileStat.size,
         });
