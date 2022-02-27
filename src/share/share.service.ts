@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FileRepository } from 'src/drive/repository/file.repository';
 
 import * as fs from 'fs'
+import * as contentDisposition from 'content-disposition';
 import { Response } from 'express';
 
 const storagePath = `${__dirname}/${process.env.STORAGE_PATH}`;
@@ -47,7 +48,7 @@ export class ShareService {
         }
         const stream = fs.createReadStream(filepath);
         res.set({
-            'Content-Disposition': `attachment; filename="${file.originalName}"`,
+            'Content-Disposition': contentDisposition(file.originalName),
             'Content-Length': fileStat.size,
         });
         return stream.pipe(res);

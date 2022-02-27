@@ -41,6 +41,7 @@ const downloadFile = async (fileId) => {
         rawResPass:true,
         config:{
             responseType:'blob',
+            timeout:0,
             onDownloadProgress: event => {
                 let percent = (event.loaded*100)/event.total;
                 if(percent==100){
@@ -52,7 +53,7 @@ const downloadFile = async (fileId) => {
         },
         callBack:res=>{
             showToast('다운로드 중입니다. 파일 크기에 따라 시간이 다소 소요될 수 있습니다.');
-            const filename = res.headers["content-disposition"].split("filename=")[1].replace(/"/g, "");
+            const filename = decodeURIComponent(res.headers["content-disposition"].split("filename*=UTF-8''")[1].replace(/"/g, ""));
             const fileUrl = window.URL.createObjectURL(new Blob([res.data], {type:res.headers['content-type']}));
             const link = document.createElement('a');
             link.href = fileUrl;
