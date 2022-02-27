@@ -45,7 +45,7 @@ const loadDriveId = () => {
             history.pushState(null, null, `/drive/${driveId}`);
             loadFiles();
         },
-        errorCallBack: data => {
+        errorCallback: data => {
             if(data.statusCode==404){
                 $('.dim.no_popup_close').classList.add('on');
                 $('#create_drive_box').classList.add('on');
@@ -94,7 +94,7 @@ const createDrive = () => {
             createDriveBoxView.changeStep(2);
             loadDriveId();
         },
-        errorCallBack: () => {
+        errorCallback: () => {
             createDriveBoxView.changeStep(0);
         }
     })

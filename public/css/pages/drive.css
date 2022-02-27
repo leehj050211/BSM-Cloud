@@ -97,12 +97,14 @@ main{
     background-color:var(--level-2);
     border-radius:0 0 1rem 1rem;
     box-shadow:var(--shadow);
-}
-#file_top_bar, #file_info, #drive_info{
     padding:2rem;
 }
-#file_info p{
+#file_info, #drive_info{
+    padding:1.5rem 2rem;
+}
+#file_info > p{
     word-break:break-all;
+    margin-bottom:.25rem;
 }
 @media screen and (min-width:0px) and (max-width:900px){
     #file_info_bar{
@@ -115,7 +117,7 @@ main{
     padding:0 2rem;
 }
 #file_sub_menu{
-    padding:2rem 2rem 0 2rem;
+    padding:1rem 2rem 0 2rem;
 }
 #file_sub_menu:not([open]),
 #file_sub_menu summary{
@@ -144,7 +146,7 @@ main{
     height:1rem;
     background-color:var(--green);
     display:block;
-    transition:.5s;
+    transition:1.5s;
 }
 /* file info end */
 
@@ -167,8 +169,8 @@ main{
     filter:var(--bright);
 }
 
-@media screen and (min-width:0px) and (max-width:780px) and
-(min-height:0px) and (min-height:500px){
+@media screen and (min-width:0px) and (max-width:780px) and (min-height:0px) and (min-height:500px),
+screen and (min-width:0px) and (max-width:550px){
     main{
         flex-direction:column;
         justify-content:space-between;
@@ -187,7 +189,10 @@ main{
         right:1.5rem;
     }
     #file_top_bar, #file_info, #drive_info{
-        padding:1.5rem 2rem;
+        padding:1.5rem;
+    }
+    #file_menu{
+        padding:0 1.5rem;
     }
     #file_info_bar{
         width:100%;

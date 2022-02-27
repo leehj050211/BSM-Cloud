@@ -85,3 +85,39 @@ const deleteFile = async (fileId) => {
         }
     })
 }
+
+const updateFile = async (fileId, flag) => {
+    if(flag){
+        if(!confirm('파일을 공유하시겠습니까?')){
+            return;
+        }
+    }else{
+        if(!confirm('파일 공유를 해제하시겠습니까?')){
+            return;
+        }
+    }
+    ajax({
+        method:'post',
+        url:`drive/share/${driveId}/${fileId}`,
+        payload:{
+            share:flag
+        },
+        callBack:()=>{
+            showToast("파일 공유 설정이 변경되었습니다");
+            loadFiles();
+            filesView.focus = -1;
+            fileInfoView.file = {
+                fileName: '',
+                fileId: '',
+                created: ''
+            }
+            if(flag){
+                const fileUrl = `https://drive.bssm.kro.kr/share/${fileId}`;
+                navigator.clipboard.writeText(fileUrl);
+                $('#share_file_url').innerText = fileUrl;
+                $('#share_file_url').href = fileUrl;
+                popupOpen($('#file_url_box'));
+            }
+        }
+    })
+}

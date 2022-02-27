@@ -46,7 +46,15 @@ const instance = axios.create({
     headers:{'Pragma':'no-cache'},
     timeout:3000,
 })
-const ajax = async ({method, url, payload, config, callBack, errorCallBack}) => {
+const ajax = async ({
+    method,
+    url,
+    payload,
+    config,
+    callBack,
+    errorCallback,
+    rawResPass
+}) => {
     $('.loading').classList.add("on");
     let res;
     try{
@@ -63,7 +71,9 @@ const ajax = async ({method, url, payload, config, callBack, errorCallBack}) => 
             }
         }
         res = await get(method);
-        res = res.data;
+        if(!rawResPass){
+            res = res.data;
+        }
     }catch(err){
         console.log(err);
         loadingInit();
@@ -85,7 +95,7 @@ const ajax = async ({method, url, payload, config, callBack, errorCallBack}) => 
             }
             return;
         }
-        if(errorCallBack && errorCallBack(err.response.data)){
+        if(errorCallback && errorCallback(err.response.data)){
             return;
         }
         switch(err.response.data.statusCode){

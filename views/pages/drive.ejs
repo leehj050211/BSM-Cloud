@@ -2,10 +2,10 @@
 <head>
     <%- include('../common/head') %>
     <title>BSM Cloud</title>
-    <meta property="title" content="BSM Cloud">
-    <meta property="description" content="BSM 클라우드 서비스">
-    <meta property="og:title" content="BSM Cloud">
-    <meta property="og:description" content="BSM 클라우드 서비스">
+    <meta property="title" content="드라이브 | BSM Cloud">
+    <meta property="description" content="드라이브 | BSM 클라우드 서비스">
+    <meta property="og:title" content="드라이브 | BSM Cloud">
+    <meta property="og:description" content="드라이브 | BSM 클라우드 서비스">
     <link rel="stylesheet" type="text/css" href="/css/pages/drive.css">
     <script src="/js/common.js"></script>
 </head>
@@ -32,30 +32,36 @@
                 <h2 v-if="file.fileName">{{file.fileName}}</h2>
                 <h2 v-if="!file.fileName">선택된 파일 없음</h2>
             </div>
-            <div id="file_info" v-if="file.fileId">
-                <p>파일 크기: {{formatBytes(file.size)}}</p>
-                <p>수정된 날짜: {{new Date(file.created).toLocaleString()}}</p>
-                <p v-if="!file.isShare">파일 공유: 비공개</p>
-                <p v-if="file.isShare">파일 공유: 공개</p>
-                <details>
-                    <summary>파일 ID 보기</summary>
-                    <p>파일 ID: {{file.fileId}}</p>
+            <div v-if="file.fileId">
+                <div id="file_info">
+                    <p>
+                        <span>파일 크기: {{formatBytes(file.size)}} • 파일 공유</span>
+                        <span v-if="!file.isShare">: 비공개</span>
+                        <span v-else>: 공개</span>
+                    </p>
+                    <p>수정된 날짜: {{new Date(file.created).toLocaleString()}}</p>
+                    <details>
+                        <summary>파일 ID 보기</summary>
+                        <p>파일 ID: {{file.fileId}}</p>
+                    </details>
+                </div>
+                <div id="file_menu">
+                    <button class="button main_button" :onclick="`downloadFile('${file.fileId}')`">다운로드</button>
+                    <button class="button clear_button" onclick="$('#file_sub_menu').toggleAttribute('open')">더보기</button>
+                </div>
+                <details id="file_sub_menu">
+                    <summary></summary>
+                    <div>
+                        <button class="button red_button" :onclick="`deleteFile('${file.fileId}')`">삭제</button>
+                        <label class="button clear_button">
+                            업데이트
+                            <input type="file" :onchange="`uploadFile(this.files[0], '${file.fileId}');this.value=''`">
+                        </label>
+                        <button v-if="!file.isShare" class="button clear_button" :onclick="`updateFile('${file.fileId}', true)`">파일 공유</button>
+                        <button v-else class="button clear_button" :onclick="`updateFile('${file.fileId}', false)`">공유 해제</button>
+                    </div>
                 </details>
             </div>
-            <div id="file_menu" v-if="file.fileId">
-                <button class="button main_button" :onclick="`downloadFile('${file.fileId}')`">다운로드</button>
-                <button class="button clear_button" onclick="$('#file_sub_menu').toggleAttribute('open')">더보기</button>
-            </div>
-            <details id="file_sub_menu">
-                <summary></summary>
-                <div>
-                    <label class="button">
-                        업데이트
-                        <input type="file" :onchange="`uploadFile(this.files[0], '${file.fileId}');this.value=''`">
-                    </label>
-                    <button class="button red_button" :onclick="`deleteFile('${file.fileId}')`">삭제</button>
-                </div>
-            </details>
             <div id="drive_info">
                 <div id="total_used_bar">
                     <div></div>
@@ -91,6 +97,15 @@
                 <h2>성공</h2>
                 <p>드라이브 생성에 성공하였습니다.</p>
             </div>
+        </div>
+        <div id="file_url_box" class="popup main center">
+            <div class="popup_close_button x_button" onClick="popupClose(this.parentElement.parentElement);$('.dim.no_popup_close').classList.remove('on');"></div>
+            <h2>공유 완료</h2>
+            <p>링크가 클립보드에 복사되었습니다.</p>
+            <details>
+                <summary>공유된 파일 링크</summary>
+                <a href="" target="blank" id="share_file_url"></a>
+            </details>
         </div>
     </div>
     <%- include('../common/common') %>
