@@ -41,8 +41,12 @@
                     </p>
                     <p>수정된 날짜: {{new Date(file.created).toLocaleString()}}</p>
                     <details>
-                        <summary>파일 ID 보기</summary>
-                        <p>파일 ID: {{file.fileId}}</p>
+                        <summary>파일 ID</summary>
+                        <p>{{file.fileId}}</p>
+                    </details>
+                    <details v-if="file.isShare">
+                        <summary>공유 링크</summary>
+                        <a :href="`https://drive.bssm.kro.kr/share/${file.fileId}`" target="blink">https://drive.bssm.kro.kr/share/{{file.fileId}}</a>
                     </details>
                 </div>
                 <div id="file_menu">

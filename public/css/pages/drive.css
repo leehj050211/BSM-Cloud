@@ -103,8 +103,10 @@ main{
     padding:1.5rem 2rem;
 }
 #file_info > p{
-    word-break:break-all;
     margin-bottom:.25rem;
+}
+#file_info *{
+    word-break:break-all;
 }
 @media screen and (min-width:0px) and (max-width:900px){
     #file_info_bar{
