@@ -42,17 +42,17 @@ export class FileRepository extends Repository<File> {
         originalName: string,
         fileName: string,
         created: Date,
-        fileSize: number
+        size: number
     ):Promise<File> {
         const fileId = getUuid().replaceAll('-', '');
         const file = this.create({
             fileId: new Buffer(fileId, 'hex'),
             driveId: new Buffer(driveId, 'hex'),
-            usercode: usercode,
-            originalName: originalName,
+            usercode,
+            originalName,
             fileName: new Buffer(fileName, 'hex'),
-            created: created,
-            size: fileSize,
+            created,
+            size,
             isShare: false
         })
 
@@ -60,7 +60,7 @@ export class FileRepository extends Repository<File> {
             return await this.save(file)
         }catch(error){
             console.error(error)
-            throw new InternalServerErrorException();
+            throw new InternalServerErrorException('Failed to upload file');
         }
     }
 
@@ -69,16 +69,16 @@ export class FileRepository extends Repository<File> {
         originalName: string,
         fileName: string,
         created: Date,
-        fileSize: number
+        size: number
     ):Promise<void> {
         try{
             this.update({
                 fileId: new Buffer(fileId, 'hex')
             }, {
-                originalName: originalName,
+                originalName,
                 fileName: new Buffer(fileName, 'hex'),
-                created: created,
-                size: fileSize
+                created,
+                size
             })
         }catch(error){
             console.error(error)
@@ -101,13 +101,13 @@ export class FileRepository extends Repository<File> {
 
     async shareFile(
         fileId: string,
-        share: boolean,
+        isShare: boolean,
     ):Promise<void> {
         try{
             this.update({
                 fileId: new Buffer(fileId, 'hex')
             }, {
-                isShare: share
+                isShare
             })
         }catch(error){
             console.error(error)

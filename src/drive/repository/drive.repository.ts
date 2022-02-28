@@ -11,8 +11,8 @@ export class DriveRepository extends Repository<Drive> {
         const uuid = getUuid().replaceAll('-', '')
         const drive = this.create({
             id: new Buffer(uuid, 'hex'),
-            usercode: usercode,
-            total: total,
+            usercode,
+            total,
             used: 0
         });
 
@@ -30,7 +30,7 @@ export class DriveRepository extends Repository<Drive> {
 
     async getDriveByUsercode(usercode: number): Promise<Drive> {
         const driveId = this.findOne({
-            usercode: usercode
+            usercode
         });
         return driveId;
     }
@@ -40,7 +40,7 @@ export class DriveRepository extends Repository<Drive> {
             this.update({
                 id: new Buffer(driveId, 'hex')
             }, {
-                used: used
+                used
             })
         }catch(error){
             console.error(error)

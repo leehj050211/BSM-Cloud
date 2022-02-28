@@ -77,4 +77,12 @@ export class DriveController {
     ) {
         return this.driveService.shareFile(user.memberCode, FileDto, share);
     }
+
+    @Post('code/:driveId/:fileId')
+    shareCode(
+        @GetUser() user: User,
+        @Param() FileDto,
+    ) {
+        return this.driveService.shareCode(user.memberCode, FileDto);
+    }
 }

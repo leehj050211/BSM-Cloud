@@ -1,6 +1,7 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FileRepository } from 'src/drive/repository/file.repository';
+import { ShareRepository } from 'src/drive/repository/shareCode.repository';
 
 import * as fs from 'fs'
 import * as contentDisposition from 'content-disposition';
@@ -13,12 +14,28 @@ export class ShareService {
 
     constructor(
         @InjectRepository(FileRepository)
-        private fileRepository: FileRepository
+        private fileRepository: FileRepository,
+        @InjectRepository(ShareRepository)
+        private shareRepository: ShareRepository
     ) {}
     
-    async getFileInfo(fileId: string) {
+    async getFileInfo({
+        fileId,
+        fileCode
+    }:{
+        fileId?: string,
+        fileCode?: string
+    }) {
+        if(fileCode){
+            const share = await this.shareRepository.getByCodeAndTime(fileCode, new Date);
+            if(!share){
+                throw new NotFoundException('File not found');
+            }
+            fileId = share.fileId.toString('hex');
+        }
+
         const file = await this.fileRepository.getFileByFileId(fileId);
-        if(!file || !file.isShare){
+        if(!file || (!file.isShare && !fileCode)){
             throw new NotFoundException('File not found');
         }
         return {
@@ -28,9 +45,23 @@ export class ShareService {
         }
     }
 
-    async downlaodFile(res: Response, fileId: string) {
+    async downlaodFile(res: Response, {
+        fileId,
+        fileCode
+    }:{
+        fileId?: string,
+        fileCode?: string
+    }) {
+        if(fileCode){
+            const share = await this.shareRepository.getByCodeAndTime(fileCode, new Date);
+            if(!share){
+                throw new NotFoundException('File not found');
+            }
+            fileId = share.fileId.toString('hex');
+        }
+        
         const file = await this.fileRepository.getFileByFileId(fileId);
-        if(!file || !file.isShare){
+        if(!file || (!file.isShare && !fileCode)){
             throw new NotFoundException('File not found');
         }
 

@@ -4,6 +4,7 @@ import { FileDto } from './dto/file.dto';
 import { DriveDto } from './dto/drive.dto';
 import { DriveRepository } from './repository/drive.repository';
 import { FileRepository } from './repository/file.repository';
+import { ShareRepository } from './repository/shareCode.repository';
 
 import * as fs from 'fs'
 import * as contentDisposition from 'content-disposition';
@@ -18,7 +19,9 @@ export class DriveService {
         @InjectRepository(DriveRepository)
         private driveRepository: DriveRepository,
         @InjectRepository(FileRepository)
-        private fileRepository: FileRepository
+        private fileRepository: FileRepository,
+        @InjectRepository(ShareRepository)
+        private shareRepository: ShareRepository
     ) {}
 
     async createDrive(usercode: number){
@@ -34,7 +37,6 @@ export class DriveService {
             throw new InternalServerErrorException('Failed to create drive');
         }
 
-        await this.driveRepository.save(drive);
         return;
     }
 
@@ -156,7 +158,6 @@ export class DriveService {
             throw new InternalServerErrorException('Failed to upload file');
         }
 
-        await this.fileRepository.save(file);
         return {
             fileId: fileId
         };
@@ -245,7 +246,6 @@ export class DriveService {
     }
 
     async shareFile(usercode: number, fileDto: FileDto, share: boolean) {
-        console.log(share)
         const {driveId: inputDriveId, fileId: inputFileId} = fileDto;
         // driveId check
         const result = await this.driveRepository.getDriveByUsercode(usercode);
@@ -270,5 +270,34 @@ export class DriveService {
             throw new InternalServerErrorException('Failed to share file');
         }
         return;
+    }
+    
+    async shareCode(usercode: number, fileDto: FileDto) {
+        const {driveId: inputDriveId, fileId: inputFileId} = fileDto;
+        // driveId check
+        const result = await this.driveRepository.getDriveByUsercode(usercode);
+        if(!result){
+            throw new NotFoundException('Drive not found');
+        }
+        const driveId = result.id.toString('hex');
+        if(inputDriveId !== driveId){
+            throw new BadRequestException(`Drive doesn't match`);
+        }
+
+        // file check
+        const file = await this.fileRepository.getFileByFileIdAndDriveId(inputFileId, driveId);
+        if(!file){
+            throw new NotFoundException('File not found');
+        }
+
+        // 2분 뒤
+        const expireTime = new Date(Date.now()+120000);
+
+        const shareFile = await this.shareRepository.shareFile(inputFileId, expireTime);
+
+        return {
+            shareCode: shareFile.code,
+            expireTime
+        };
     }
 }

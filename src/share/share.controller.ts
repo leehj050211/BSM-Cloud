@@ -7,17 +7,30 @@ import { ShareService } from './share.service';
 @UseGuards(JwtAuthGuard)
 export class ShareController {
     constructor(private shareService: ShareService) {}
-
+    
     @Get(':fileId')
-    getFileInfo(@Param('fileId') fileId: string) {
-        return this.shareService.getFileInfo(fileId);
+    getFileInfoById(@Param('fileId') fileId: string) {
+        return this.shareService.getFileInfo({fileId});
     }
 
+    @Get('code/:fileCode')
+    getFileInfoByCode(@Param('fileCode') fileCode: string) {
+        return this.shareService.getFileInfo({fileCode});
+    }
+    
     @Get('download/:fileId')
-    downloadFile(
+    downloadFileById(
         @Res() res: Response,
         @Param('fileId') fileId: string
     ) {
-        return this.shareService.downlaodFile(res, fileId);
+        return this.shareService.downlaodFile(res, {fileId});
+    }
+
+    @Get('download/code/:fileCode')
+    downloadFileByCode(
+        @Res() res: Response,
+        @Param('fileCode') fileCode: string
+    ) {
+        return this.shareService.downlaodFile(res, {fileCode});
     }
 }
