@@ -20,15 +20,9 @@ export class AppController {
     driveId() {
         return;
     }
-    
-    @Get('code')
-    @Render('share')
-    shareHomeByCode() {
-        return;
-    }
 
     @Get('code/:fileCode')
-    @Render('share')
+    @Render('code')
     shareByCode() {
         return;
     }

@@ -15,9 +15,31 @@ main{
   text-align:center;
   color:#fff;
 }
-h1#main{
+
+h1.main{
   font-size:6.4rem;
 }
-p#main{
-  margin:1rem 0 3rem 0;
+@media screen and (min-width:0px) and (max-width:780px) {
+  h1.main{
+    font-size:5.4rem;
+  }
+}
+p.main{
+  margin:1rem 0;
+}
+
+#share_code_box{
+  margin:4rem 0;
+}
+#share_code_box input{
+  margin:0;
+}
+@media screen and (min-width:0px) and (max-width:540px) {
+  #share_code_box{
+    display:flex;
+    gap:.5rem;
+  }
+  #share_code_box input{
+    width:20rem;
+  }
 }
