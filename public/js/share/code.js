@@ -54,7 +54,13 @@ const downloadFile = async (code) => {
         },
         callBack:res=>{
             showToast('다운로드 중입니다. 파일 크기에 따라 시간이 다소 소요될 수 있습니다.');
-            const filename = decodeURIComponent(res.headers["content-disposition"].split("filename*=UTF-8''")[1].replace(/"/g, ""));
+            let filename
+            if(res.headers["content-disposition"].indexOf("filename*=UTF-8''")<0){
+                filename = res.headers["content-disposition"].split("filename=")[1].replace(/"/g, "");
+            }else{
+                filename = decodeURIComponent(res.headers["content-disposition"].split("filename*=UTF-8''")[1]?.replace(/"/g, ""));
+            }
+            
             const fileUrl = window.URL.createObjectURL(new Blob([res.data], {type:res.headers['content-type']}));
             const link = document.createElement('a');
             link.href = fileUrl;

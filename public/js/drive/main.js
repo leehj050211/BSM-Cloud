@@ -1,6 +1,7 @@
 const selectFile = fileIdx => {
     filesView.focus = filesView.files[fileIdx].fileId;
     fileInfoView.file = filesView.files[fileIdx];
+    fileShareView.file = filesView.files[fileIdx];
 }
 
 const uploadFile = (file, fileId) => {
@@ -53,7 +54,13 @@ const downloadFile = async (fileId) => {
         },
         callBack:res=>{
             showToast('다운로드 중입니다. 파일 크기에 따라 시간이 다소 소요될 수 있습니다.');
-            const filename = decodeURIComponent(res.headers["content-disposition"].split("filename*=UTF-8''")[1].replace(/"/g, ""));
+            let filename
+            if(res.headers["content-disposition"].indexOf("filename*=UTF-8''")<0){
+                filename = res.headers["content-disposition"].split("filename=")[1].replace(/"/g, "");
+            }else{
+                filename = decodeURIComponent(res.headers["content-disposition"].split("filename*=UTF-8''")[1]?.replace(/"/g, ""));
+            }
+
             const fileUrl = window.URL.createObjectURL(new Blob([res.data], {type:res.headers['content-type']}));
             const link = document.createElement('a');
             link.href = fileUrl;
@@ -85,7 +92,7 @@ const deleteFile = async (fileId) => {
     })
 }
 
-const updateFile = async (fileId, flag) => {
+const shareFile = async (fileId, flag) => {
     if(flag){
         if(!confirm('파일을 공유하시겠습니까?')){
             return;
@@ -110,6 +117,7 @@ const updateFile = async (fileId, flag) => {
                 fileId: '',
                 created: ''
             }
+            popupClose($('#share_file_box'))
             if(flag){
                 const fileUrl = `https://drive.bssm.kro.kr/share/${fileId}`;
                 navigator.clipboard.writeText(fileUrl);
@@ -117,6 +125,24 @@ const updateFile = async (fileId, flag) => {
                 $('#share_file_url').href = fileUrl;
                 popupOpen($('#file_url_box'));
             }
+        }
+    })
+}
+
+const shareFileCode = async (fileId) => {
+    if(!confirm('파일을 간편 공유 하시겠습니까?')){
+        return;
+    }
+    ajax({
+        method:'post',
+        url:`drive/code/${driveId}/${fileId}`,
+        callBack:data=>{
+            showToast("간편 공유가 완료되었습니다");
+            popupClose($('#share_file_box'))
+            const shareCode = data.shareCode;
+            navigator.clipboard.writeText(shareCode);
+            $('#share_file_code').innerText = shareCode;
+            popupOpen($('#share_file_code_box'));
         }
     })
 }

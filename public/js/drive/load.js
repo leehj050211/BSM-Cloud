@@ -29,6 +29,16 @@ const fileInfoView = Vue.createApp({
         }
     }
 }).mount('#file_info_bar');
+const fileShareView = Vue.createApp({
+    data() {
+        return {
+            file: {
+                fileId: '',
+                isShare: false
+            }
+        }
+    }
+}).mount('#share_file_box');
 
 const loadDriveId = () => {
     progress(20);
