@@ -14,6 +14,7 @@
         <section id="file_section">
             <ul id="files">
                 <li v-for="(file, idx) in files" :class="{active:focus==file.fileId}" :onclick="`selectFile(${idx})`">
+                    <div v-if="file.isShare" class="share_file_icon"></div>
                     <div class="file_icon">
                         {{file.fileName.split('.')[file.fileName.split('.').length-1]}}
                     </div>
@@ -56,7 +57,7 @@
                 <details id="file_sub_menu">
                     <summary></summary>
                     <div>
-                        <button class="button red_button" :onclick="`deleteFile('${file.fileId}')`">삭제</button>
+                        <button class="button delete_button" :onclick="`deleteFile('${file.fileId}')`">삭제</button>
                         <label class="button clear_button">
                             업데이트
                             <input type="file" :onchange="`uploadFile(this.files[0], '${file.fileId}');this.value=''`">
@@ -107,8 +108,8 @@
             <h2>파일 공유</h2>
             <h4>일반 공유</h4><br>
             <p>링크로 공유되며 공유를 해제할 때 까지 파일에 접근할 수 있습니다</p>
-            <button v-if="!file.isShare" class="button red_button" :onclick="`shareFile('${file.fileId}', true)`">공유 꺼짐</button>
-            <button v-else class="button green_button" :onclick="`shareFile('${file.fileId}', false)`">공유 켜짐</button>
+            <button v-if="!file.isShare" class="button button_off" :onclick="`shareFile('${file.fileId}', true)`">공유 꺼짐</button>
+            <button v-else class="button button_on" :onclick="`shareFile('${file.fileId}', false)`">공유 켜짐</button>
             <br><br><br>
             <h4>간편 공유</h4><br>
             <p>4자리의 코드로 2분동안 공유되며 아래의 페이지에서 코드를 입력해 파일에 접근 할 수 있습니다</p>

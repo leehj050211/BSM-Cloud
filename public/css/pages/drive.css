@@ -23,16 +23,16 @@ main{
 }
 #files {
     display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(20rem, 1fr));
+    grid-template-columns:repeat(auto-fill, minmax(25rem, 1fr));
     gap:1rem;
 }
 
 #files li{
+    position:relative;
     display:flex;
     flex-direction:column;
     width:100%;
-    max-width:30rem;
-    height:20rem;
+    height:15rem;
     border-radius:1rem;
     overflow:hidden;
     background-color:var(--level-1);
@@ -64,22 +64,39 @@ main{
 }
 .file_name{
     width:100%;
-    padding:1rem;
+    padding:1.25rem 1rem;
     background-color:var(--level-2);
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
+    font-size:1.7rem;
+}
+.share_file_icon{
+    position:absolute;
+    top:1rem;
+    left:1rem;
+    width:2.5rem;
+    height:2.5rem;
+    background-image:url('/resource/common/images/share.svg');
+    background-size:2.5rem;
+    background-repeat:no-repeat;
+    background-position:center;
+    filter:var(--bright);
 }
 
 @media screen and (min-width:0px) and (max-width:600px){
     #files{
-        grid-template-columns:repeat(auto-fill, minmax(15rem, 1fr));
+        grid-template-columns:repeat(auto-fill, minmax(20rem, 1fr));
     }
     #files li{
-        height:15rem;
+        height:12.5rem;
     }
     .file_icon{
         font-size:2.4rem;
+    }
+    .file_name{
+        padding:1rem;
+        font-size:1.5rem;
     }
 }
 /* file section end */
@@ -195,6 +212,9 @@ screen and (min-width:0px) and (max-width:550px){
     }
     #file_menu{
         padding:0 1.5rem;
+    }
+    #file_sub_menu{
+        padding:1rem 1.5rem 0 1.5rem;
     }
     #file_info_bar{
         width:100%;

@@ -293,9 +293,13 @@ input[type=file]{
   width:100%;
   flex:1;
 }
-.red_button{
+.button_on{
+  background-color:var(--green) !important;
+}
+.button_off, .delete_button{
   background-color:var(--red) !important;
 }
+
 .icon object{
   pointer-events:none;
   filter:var(--bright);

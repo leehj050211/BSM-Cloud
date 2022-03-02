@@ -117,7 +117,7 @@ const shareFile = async (fileId, flag) => {
                 fileId: '',
                 created: ''
             }
-            popupClose($('#share_file_box'))
+            popupClose($('#share_file_box'));
             if(flag){
                 const fileUrl = `https://drive.bssm.kro.kr/share/${fileId}`;
                 navigator.clipboard.writeText(fileUrl);

@@ -25,7 +25,7 @@ const fileInfoView = Vue.createApp({
     },
     methods: {
         formatBytes: function(bytes){
-            return formatBytes(bytes)
+            return formatBytes(bytes);
         }
     }
 }).mount('#file_info_bar');
