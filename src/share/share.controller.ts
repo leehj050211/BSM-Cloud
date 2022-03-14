@@ -1,10 +1,8 @@
-import { Controller, Get, Param, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Res } from '@nestjs/common';
 import { Response } from 'express';
-import JwtAuthGuard from 'src/auth/auth.guard';
 import { ShareService } from './share.service';
 
 @Controller('api/share')
-@UseGuards(JwtAuthGuard)
 export class ShareController {
     constructor(private shareService: ShareService) {}
     
