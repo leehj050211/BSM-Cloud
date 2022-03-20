@@ -107,13 +107,12 @@
             <div class="popup_close_button x_button" onClick="popupClose(this.parentElement);$('.dim.no_popup_close').classList.remove('on');"></div>
             <h2>파일 공유</h2>
             <h4>일반 공유</h4><br>
-            <p>링크로 공유되며 공유를 해제할 때 까지 파일에 접근할 수 있습니다</p>
+            <p>파일을 공유할 수 있는 링크가 생성됩니다</p>
             <button v-if="!file.isShare" class="button button_off" :onclick="`shareFile('${file.fileId}', true)`">공유 꺼짐</button>
             <button v-else class="button button_on" :onclick="`shareFile('${file.fileId}', false)`">공유 켜짐</button>
-            <br><br><br>
+            <br><br>
             <h4>간편 공유</h4><br>
-            <p>4자리의 코드로 2분동안 공유되며 아래의 페이지에서 코드를 입력해 파일에 접근 할 수 있습니다</p>
-            <a href="/home" target="blink">코드 입력 페이지</a><br><br>
+            <p>2분동안 사용할 수 있는 4자리의 코드가 발급되며 홈 화면에서 코드를 입력해 파일에 접근 할 수 있습니다</p>
             <button class="button" :onclick="`shareFileCode('${file.fileId}')`">간편 공유</button>
         </div>
 

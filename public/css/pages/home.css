@@ -33,6 +33,10 @@ p.main{
 }
 #share_code_box input{
   margin:0;
+  color:#fff;
+}
+#share_code_box input::placeholder{
+  color:#fff;
 }
 @media screen and (min-width:0px) and (max-width:540px) {
   #share_code_box{

@@ -4,7 +4,7 @@ import { Controller, Get, Redirect, Render } from '@nestjs/common';
 export class AppController {
 
     @Get()
-    @Redirect('/drive/')
+    @Render('home')
     root(){
         return;
     }
@@ -30,12 +30,6 @@ export class AppController {
     @Get('share/:fileId')
     @Render('share')
     shareById() {
-        return;
-    }
-
-    @Get('home')
-    @Render('home')
-    home() {
         return;
     }
 }
