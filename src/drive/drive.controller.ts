@@ -8,6 +8,7 @@ import { User } from 'src/auth/user.model';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileMulterOption } from './file.multerOption';
 import { Response } from 'express';
+import { FolderDto } from './dto/folder.dto';
 
 @Controller('api/drive')
 @UseGuards(JwtAuthGuard)
@@ -19,12 +20,12 @@ export class DriveController {
         return this.driveService.createDrive(user.memberCode);
     }
 
-    @Get('')
+    @Get()
     getDrive(@GetUser() user: User) {
         return this.driveService.getDrive(user.memberCode);
     }
 
-    @Get(':driveId')
+    @Get(':driveId/:folderId?')
     getFileList(
         @GetUser() user: User,
         @Param() DriveDto
@@ -32,7 +33,7 @@ export class DriveController {
         return this.driveService.getFileList(user.memberCode, DriveDto);
     }
     
-    @Get(':driveId/:fileId')
+    @Get(':driveId/:folderId?/:fileId')
     downloadFile(
         @Res() res: Response,
         @GetUser() user: User,
@@ -52,7 +53,7 @@ export class DriveController {
     }
 
     @UseInterceptors(FileInterceptor('file', FileMulterOption))
-    @Put(':driveId/:fileId')
+    @Put('upload/:driveId/:fileId')
     updateFile(
         @GetUser() user: User,
         @Param() FileDto,
@@ -85,4 +86,22 @@ export class DriveController {
     ) {
         return this.driveService.shareCode(user.memberCode, FileDto);
     }
+
+    @Post('folder/:driveId/:folderId?')
+    createFolder(
+        @GetUser() user: User,
+        @Param() FolderDto,
+        @Body('folderName') folderName
+    ) {
+        return this.driveService.createFolder(user.memberCode, FolderDto, folderName);
+    }
+
+    // @Put('upload/:driveId/:fileId')
+    // updateFolder(
+    //     @GetUser() user: User,
+    //     @Param() FileDto,
+    //     @Body('folderName')
+    // ) {
+    //     return this.driveService.updateFile(user.memberCode, FileDto, inputFile);
+    // }
 }

@@ -1,7 +1,8 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FileDto } from './dto/file.dto';
 import { DriveDto } from './dto/drive.dto';
+import { FolderDto } from './dto/folder.dto';
 import { DriveRepository } from './repository/drive.repository';
 import { FileRepository } from './repository/file.repository';
 import { ShareRepository } from './repository/shareCode.repository';
@@ -9,6 +10,7 @@ import { ShareRepository } from './repository/shareCode.repository';
 import * as fs from 'fs'
 import * as contentDisposition from 'content-disposition';
 import { Response } from 'express';
+import { FolderRepository } from './repository/folder.repository';
 
 const storagePath = `${__dirname}/${process.env.STORAGE_PATH}`;
 
@@ -21,7 +23,9 @@ export class DriveService {
         @InjectRepository(FileRepository)
         private fileRepository: FileRepository,
         @InjectRepository(ShareRepository)
-        private shareRepository: ShareRepository
+        private shareRepository: ShareRepository,
+        @InjectRepository(FolderRepository)
+        private folderRepository: FolderRepository
     ) {}
 
     async createDrive(usercode: number){
@@ -57,7 +61,7 @@ export class DriveService {
     }
 
     async getFileList(usercode: number, driveDto: DriveDto) {
-        const {driveId: inputDriveId} = driveDto;
+        const {driveId: inputDriveId, folderId} = driveDto;
         // driveId check
         const result = await this.driveRepository.getDriveByUsercode(usercode);
         if(!result){
@@ -70,7 +74,12 @@ export class DriveService {
         const total = result.total;
         const used = result.used;
 
-        const files = (await this.fileRepository.getFileList(driveId)).map(file => {
+
+        const [filesInfo, foldersInfo] = await Promise.all([
+            this.fileRepository.getFileList(driveId),
+            this.folderRepository.getFolderList(driveId, folderId)
+        ])
+        const files = filesInfo.map(file => {
             return {
                 fileId: file.fileId.toString('hex'),
                 fileName: file.originalName,
@@ -79,8 +88,17 @@ export class DriveService {
                 isShare: file.isShare
             }
         })
+        const folders = foldersInfo.map(folder => {
+            return {
+                folderId: folder.folderId.toString('hex'),
+                folderName: folder.folderName,
+                created: folder.created,
+                isShare: folder.isShare
+            }
+        })
         return {
             files,
+            folders,
             total,
             used
         };
@@ -298,6 +316,42 @@ export class DriveService {
         return {
             shareCode: shareFile.code,
             expireTime
+        };
+    }
+
+    async createFolder(usercode: number, folderDto: FolderDto, folderName: string){
+        const {driveId: inputDriveId, folderId: parentId} = folderDto;
+        // driveId check
+        const drive = await this.driveRepository.getDriveByUsercode(usercode);
+        if(!drive){
+            throw new NotFoundException('Drive not found');
+        }
+        const driveId = drive.id.toString('hex');
+        if(inputDriveId !== driveId){
+            throw new BadRequestException(`Drive doesn't match`);
+        }
+        if (typeof parentId !== 'undefined') {
+            // folder check
+            if (!await this.folderRepository.getFolderByDriveId(parentId, driveId)) {
+                throw new NotFoundException('Folder not found');
+            }
+        }
+        // folderName check
+        if (await this.folderRepository.getFolderByName(driveId, parentId, folderName)) {
+            throw new ConflictException('Same folder already exists');
+        }
+
+        const folder = await this.folderRepository.createFolder(driveId, usercode, folderName, new Date, parentId);
+        const folderId: string = folder.folderId.toString('hex');
+
+        try{
+            await fs.promises.mkdir(`${storagePath}/${driveId}/${folderId}`); 
+        }catch(error){
+            console.error(error);
+            throw new InternalServerErrorException('Failed to create folder');
+        }
+        return {
+            folderId
         };
     }
 }

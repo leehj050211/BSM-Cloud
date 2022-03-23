@@ -20,7 +20,7 @@ export class DriveRepository extends Repository<Drive> {
             return await this.save(drive)
         }catch(error){
             if(error.sqlState === '23000'){
-                throw new ConflictException('Existing drive');
+                throw new ConflictException('Drive already exists');
             }else{
                 console.error(error)
                 throw new InternalServerErrorException();

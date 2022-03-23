@@ -1,19 +1,12 @@
 import { Entity, Column } from 'typeorm';
 
 @Entity()
-export class File {
+export class Folder {
     @Column({
         type: 'binary',
         length: 16,
         primary: true,
         nullable: false
-    })
-    fileId: Buffer;
-
-    @Column({
-        type: 'binary',
-        length: 16,
-        nullable: true
     })
     folderId: Buffer;
 
@@ -34,29 +27,14 @@ export class File {
         length: 64,
         nullable: false
     })
-    originalName: string;
+    folderName: string;
 
-    @Column({
-        type: 'binary',
-        length: 16,
-        nullable: false
-    })
-    fileName: Buffer;
-
-    @Column({
-        nullable: false
-    })
+    @Column({nullable: false})
     created: Date;
 
-    @Column({
-        type: 'int',
-        unsigned: true,
-        nullable: false
-    })
-    size: number;
-
-    @Column({
-        nullable: false
-    })
+    @Column({nullable: false})
     isShare: boolean;
+
+    @Column({nullable:true})
+    parentId: Buffer;
 }

@@ -18,20 +18,24 @@ export class FileRepository extends Repository<File> {
 
     async getFileByFileIdAndDriveId(
         fileId: string,
-        driveId: string
+        driveId: string,
+        folderId?: string
     ):Promise<File> {
         const file = this.findOne({
             fileId: new Buffer(fileId, 'hex'),
-            driveId: new Buffer(driveId, 'hex')
+            driveId: new Buffer(driveId, 'hex'),
+            folderId: typeof folderId === 'string'? new Buffer(folderId, 'hex'): null
         })
         return file;
     }
 
     async getFileList(
-        driveId: string
+        driveId: string,
+        folderId?: string
     ):Promise<File[]> {
         const fileList = this.find({
-            driveId: new Buffer(driveId, 'hex')
+            driveId: new Buffer(driveId, 'hex'),
+            folderId: folderId? new Buffer(folderId, 'hex'): null
         })
         return fileList;
     }
@@ -56,10 +60,10 @@ export class FileRepository extends Repository<File> {
             isShare: false
         })
 
-        try{
+        try {
             return await this.save(file)
-        }catch(error){
-            console.error(error)
+        } catch (error) {
+            console.error(error);
             throw new InternalServerErrorException('Failed to upload file');
         }
     }
@@ -69,32 +73,36 @@ export class FileRepository extends Repository<File> {
         originalName: string,
         fileName: string,
         created: Date,
-        size: number
+        size: number,
+        folderId?: string
     ):Promise<void> {
-        try{
+        try {
             this.update({
-                fileId: new Buffer(fileId, 'hex')
+                fileId: new Buffer(fileId, 'hex'),
+                folderId: folderId? new Buffer(folderId, 'hex'): null
             }, {
                 originalName,
                 fileName: new Buffer(fileName, 'hex'),
                 created,
                 size
             })
-        }catch(error){
-            console.error(error)
+        } catch (error) {
+            console.error(error);
             throw new InternalServerErrorException();
         }
     }
 
     async deleteFile(
-        fileId: string
+        fileId: string,
+        folderId?: string
     ):Promise<void> {
-        try{
+        try {
             await this.delete({
                 fileId: new Buffer(fileId, 'hex'),
+                folderId: folderId? new Buffer(folderId, 'hex'): null
             })
-        }catch(error){
-            console.error(error)
+        } catch (error) {
+            console.error(error);
             throw new InternalServerErrorException();
         }
     }
@@ -102,15 +110,17 @@ export class FileRepository extends Repository<File> {
     async shareFile(
         fileId: string,
         isShare: boolean,
+        folderId?: string
     ):Promise<void> {
-        try{
+        try {
             this.update({
-                fileId: new Buffer(fileId, 'hex')
+                fileId: new Buffer(fileId, 'hex'),
+                folderId: folderId? new Buffer(folderId, 'hex'): null
             }, {
                 isShare
             })
-        }catch(error){
-            console.error(error)
+        } catch (error) {
+            console.error(error);
             throw new InternalServerErrorException();
         }
     }
