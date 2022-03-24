@@ -1,7 +1,6 @@
 import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FileDto } from './dto/file.dto';
-import { DriveDto } from './dto/drive.dto';
 import { FolderDto } from './dto/folder.dto';
 import { DriveRepository } from './repository/drive.repository';
 import { FileRepository } from './repository/file.repository';
@@ -28,16 +27,16 @@ export class DriveService {
         private folderRepository: FolderRepository
     ) {}
 
-    async createDrive(usercode: number){
+    async createDrive(usercode: number) {
         // 1.5GB
         const totalStorage = 1610612736;
         const drive = await this.driveRepository.createDrive(usercode, totalStorage);
         const driveId: string = drive.id.toString('hex');
 
-        try{
+        try {
             await fs.promises.mkdir(`${storagePath}/${driveId}`); 
-        }catch(error){
-            console.error(error);
+        } catch(error) {
+            console.error(error);;
             throw new InternalServerErrorException('Failed to create drive');
         }
 
@@ -46,7 +45,7 @@ export class DriveService {
 
     async getDrive(usercode: number) {
         const result = await this.driveRepository.getDriveByUsercode(usercode);
-        if(!result){
+        if (!result) {
             throw new NotFoundException('Drive not found');
         }
 
@@ -60,15 +59,15 @@ export class DriveService {
         }
     }
 
-    async getFileList(usercode: number, driveDto: DriveDto) {
-        const {driveId: inputDriveId, folderId} = driveDto;
+    async getFileList(usercode: number, folderDto: FolderDto) {
+        const {driveId: inputDriveId} = folderDto;
         // driveId check
         const result = await this.driveRepository.getDriveByUsercode(usercode);
-        if(!result){
+        if (!result) {
             throw new NotFoundException('Drive not found');
         }
         const driveId = result.id.toString('hex');
-        if(inputDriveId !== driveId){
+        if (inputDriveId !== driveId) {
             throw new BadRequestException(`Drive doesn't match`);
         }
         const total = result.total;
@@ -76,9 +75,9 @@ export class DriveService {
 
 
         const [filesInfo, foldersInfo] = await Promise.all([
-            this.fileRepository.getFileList(driveId),
-            this.folderRepository.getFolderList(driveId, folderId)
-        ])
+            this.fileRepository.getFileListByFolderDto(folderDto),
+            this.folderRepository.getFolderList(folderDto)
+        ]);
         const files = filesInfo.map(file => {
             return {
                 fileId: file.fileId.toString('hex'),
@@ -105,35 +104,35 @@ export class DriveService {
     }
 
     async downloadFile(res: Response, usercode: number, fileDto: FileDto) {
-        const {driveId: inputDriveId, fileId: inputFileId} = fileDto;
+        const {driveId: inputDriveId, folderId} = fileDto;
         // driveId check
         const result = await this.driveRepository.getDriveByUsercode(usercode);
-        if(!result){
+        if (!result) {
             throw new NotFoundException('Drive not found');
         }
         const driveId = result.id.toString('hex');
-        if(inputDriveId !== driveId){
+        if (inputDriveId !== driveId) {
             throw new BadRequestException(`Drive doesn't match`);
         }
 
-        const file = await this.fileRepository.getFileByFileIdAndDriveId(inputFileId, driveId);
-        if(!file){
+        const file = await this.fileRepository.getFileByFileDto(fileDto);
+        if (!file) {
             throw new NotFoundException('File not found');
         }
-
-        const filepath = `${storagePath}/${driveId}/${file.fileName.toString('hex')}`;
+        
+        const filePath = `${storagePath}/${driveId}/${folderId === 'root'? '': folderId+'/'}${file.fileName.toString('hex')}`;
         let fileStat;
-        try{
-            fileStat = await fs.promises.stat(filepath);
-        }catch(err){
+        try {
+            fileStat = await fs.promises.stat(filePath);
+        } catch(err) {
             console.error(err);
-            if(err.code=='ENOENT'){
+            if (err.code=='ENOENT') {
                 throw new NotFoundException('Original file not found');
             }else{
                 throw new InternalServerErrorException();
             }
         }
-        const stream = fs.createReadStream(filepath);
+        const stream = fs.createReadStream(filePath);
         res.set({
             'Content-Disposition': contentDisposition(file.originalName),
             'Content-Length': fileStat.size,
@@ -141,38 +140,39 @@ export class DriveService {
         return stream.pipe(res);
     }
 
-    async uploadFile(usercode: number, driveDto: DriveDto, inputFile) {
-        const {driveId: inputDriveId} = driveDto;
+    async uploadFile(usercode: number, folderDto: FolderDto, inputFile) {
+        const {driveId: inputDriveId, folderId} = folderDto;
         // driveId check
         const result = await this.driveRepository.getDriveByUsercode(usercode);
-        if(!result){
+        if (!result) {
             throw new NotFoundException('Drive not found');
         }
         const driveId = result.id.toString('hex');
-        if(inputDriveId !== driveId){
+        if (inputDriveId !== driveId) {
             throw new BadRequestException(`Drive doesn't match`);
         }
         const fileSize = parseInt(inputFile.size);
         const totalUsed = result.used + fileSize;
-        if(totalUsed > result.total){
-            try{
+        if (totalUsed > result.total) {
+            try {
                 fs.promises.rm(inputFile.path); 
-            }catch (error){
-                console.error(error)
+            } catch (error) {
+                console.error(error);
             }
             throw new BadRequestException('No more storage space');
         }
 
-        const file = await this.fileRepository.uploadFile(driveId, usercode, inputFile.originalname, inputFile.filename, new Date(), fileSize);
-        const fileId: string = file.fileId.toString('hex')
+        const file = await this.fileRepository.uploadFile(folderDto, usercode, inputFile.originalname, inputFile.filename, new Date(), fileSize);
+        const fileId: string = file.fileId.toString('hex');
 
-        try{
+        const newFilePath = `${storagePath}/${driveId}/${folderId === 'root'? '': folderId+'/'}${inputFile.filename}`;
+        try {
             await Promise.all([
                 this.driveRepository.updateTotalUsed(driveId, totalUsed),
-                fs.promises.rename(inputFile.path, `${storagePath}/${driveId}/${inputFile.filename}`)
-            ])
-        }catch (error){
-            console.error(error)
+                fs.promises.rename(inputFile.path, newFilePath)
+            ]);
+        } catch (error) {
+            console.error(error);
             throw new InternalServerErrorException('Failed to upload file');
         }
 
@@ -182,81 +182,89 @@ export class DriveService {
     }
 
     async updateFile(usercode: number, fileDto: FileDto, inputFile) {
-        const {driveId: inputDriveId, fileId: inputFileId} = fileDto;
+        const {driveId: inputDriveId, folderId} = fileDto;
         // driveId check
         const result = await this.driveRepository.getDriveByUsercode(usercode);
-        if(!result){
+        if (!result) {
             throw new NotFoundException('Drive not found');
         }
         const driveId = result.id.toString('hex');
-        if(inputDriveId !== driveId){
+        if (inputDriveId !== driveId) {
             throw new BadRequestException(`Drive doesn't match`);
         }
 
         // file check
-        const file = await this.fileRepository.getFileByFileIdAndDriveId(inputFileId, driveId);
-        if(!file){
+        const file = await this.fileRepository.getFileByFileDto(fileDto);
+        if (!file) {
             throw new NotFoundException('File not found');
         }
         const oldFileName = file.fileName.toString('hex');
         const newFileName = inputFile.filename;
         const newFileSize = parseInt(inputFile.size);
         const totalUsed = (result.used - file.size) + newFileSize;
-        if(totalUsed > result.total){
-            try{
+        if (totalUsed > result.total) {
+            try {
                 fs.promises.rm(inputFile.path); 
-            }catch (error){
-                console.error(error)
+            } catch (error) {
+                console.error(error);
             }
             throw new BadRequestException('No more storage space');
         }
 
         // update file
-        try{
-            await fs.promises.rename(inputFile.path, `${storagePath}/${driveId}/${newFileName}`); 
-        }catch (error){
-            console.error(error)
+        const newFilePath = `${storagePath}/${driveId}/${folderId === 'root'? '': folderId+'/'}${newFileName}`;
+        try {
+            await fs.promises.rename(inputFile.path, newFilePath); 
+        } catch (error) {
+            console.error(error);
             throw new InternalServerErrorException('Failed to update file');
         }
-        try{
+        try {
             await Promise.all([
                 this.driveRepository.updateTotalUsed(driveId, totalUsed),
-                this.fileRepository.updateFile(inputFileId, inputFile.originalname, newFileName, new Date(), newFileSize),
+                this.fileRepository.updateFile(
+                    fileDto,
+                    inputFile.originalname,
+                    newFileName,
+                    new Date(),
+                    newFileSize
+                ),
                 fs.promises.rm(`${storagePath}/${driveId}/${oldFileName}`)
-            ])
-        }catch (error){
-            console.error(error)
+            ]);
+        } catch (error) {
+            console.error(error);
             throw new InternalServerErrorException('Failed to update file');
         }
         return;
     }
 
     async deleteFile(usercode: number, fileDto: FileDto) {
-        const {driveId: inputDriveId, fileId: inputFileId} = fileDto;
+        const {driveId: inputDriveId, folderId} = fileDto;
         // driveId check
         const result = await this.driveRepository.getDriveByUsercode(usercode);
-        if(!result){
+        if (!result) {
             throw new NotFoundException('Drive not found');
         }
         const driveId = result.id.toString('hex');
-        if(inputDriveId !== driveId){
+        if (inputDriveId !== driveId) {
             throw new BadRequestException(`Drive doesn't match`);
         }
 
         // file check
-        const file = await this.fileRepository.getFileByFileIdAndDriveId(inputFileId, driveId);
-        if(!file){
+        const file = await this.fileRepository.getFileByFileDto(fileDto);
+        if (!file) {
             throw new NotFoundException('File not found');
         }
         const fileName = file.fileName.toString('hex');
         const totalUsed = result.used - file.size;
 
         // delete file
-        await this.fileRepository.deleteFile(inputFileId);
-        try{
-            await fs.promises.rm(`${storagePath}/${driveId}/${fileName}`); 
-        }catch (error){
-            console.error(error)
+        await this.fileRepository.deleteFile(fileDto);
+        const filePath = `${storagePath}/${driveId}/${folderId === 'root'? '': folderId+'/'}${fileName}`;
+        try {
+            await fs.promises.rm(filePath); 
+        } catch (error) {
+            console.error(error);
             throw new InternalServerErrorException('Failed to delete file');
         }
         this.driveRepository.updateTotalUsed(driveId, totalUsed);
@@ -264,27 +272,27 @@ export class DriveService {
     }
 
     async shareFile(usercode: number, fileDto: FileDto, share: boolean) {
-        const {driveId: inputDriveId, fileId: inputFileId} = fileDto;
+        const {driveId: inputDriveId} = fileDto;
         // driveId check
         const result = await this.driveRepository.getDriveByUsercode(usercode);
-        if(!result){
+        if (!result) {
             throw new NotFoundException('Drive not found');
         }
         const driveId = result.id.toString('hex');
-        if(inputDriveId !== driveId){
+        if (inputDriveId !== driveId) {
             throw new BadRequestException(`Drive doesn't match`);
         }
 
         // file check
-        const file = await this.fileRepository.getFileByFileIdAndDriveId(inputFileId, driveId);
-        if(!file){
+        const file = await this.fileRepository.getFileByFileDto(fileDto);
+        if (!file) {
             throw new NotFoundException('File not found');
         }
 
-        try{
-            await this.fileRepository.shareFile(inputFileId, share);
-        }catch (error){
-            console.error(error)
+        try {
+            await this.fileRepository.shareFile(fileDto, share);
+        } catch (error) {
+            console.error(error);
             throw new InternalServerErrorException('Failed to share file');
         }
         return;
@@ -294,17 +302,17 @@ export class DriveService {
         const {driveId: inputDriveId, fileId: inputFileId} = fileDto;
         // driveId check
         const result = await this.driveRepository.getDriveByUsercode(usercode);
-        if(!result){
+        if (!result) {
             throw new NotFoundException('Drive not found');
         }
         const driveId = result.id.toString('hex');
-        if(inputDriveId !== driveId){
+        if (inputDriveId !== driveId) {
             throw new BadRequestException(`Drive doesn't match`);
         }
 
         // file check
-        const file = await this.fileRepository.getFileByFileIdAndDriveId(inputFileId, driveId);
-        if(!file){
+        const file = await this.fileRepository.getFileByFileDto(fileDto);
+        if (!file) {
             throw new NotFoundException('File not found');
         }
 
@@ -319,35 +327,35 @@ export class DriveService {
         };
     }
 
-    async createFolder(usercode: number, folderDto: FolderDto, folderName: string){
+    async createFolder(usercode: number, folderDto: FolderDto, folderName: string) {
         const {driveId: inputDriveId, folderId: parentId} = folderDto;
         // driveId check
         const drive = await this.driveRepository.getDriveByUsercode(usercode);
-        if(!drive){
+        if (!drive) {
             throw new NotFoundException('Drive not found');
         }
         const driveId = drive.id.toString('hex');
-        if(inputDriveId !== driveId){
+        if (inputDriveId !== driveId) {
             throw new BadRequestException(`Drive doesn't match`);
         }
-        if (typeof parentId !== 'undefined') {
+        if (parentId !== 'root') {
             // folder check
-            if (!await this.folderRepository.getFolderByDriveId(parentId, driveId)) {
+            if (!await this.folderRepository.getFolderByFolderDto(folderDto)) {
                 throw new NotFoundException('Folder not found');
             }
         }
         // folderName check
-        if (await this.folderRepository.getFolderByName(driveId, parentId, folderName)) {
+        if (await this.folderRepository.getFolderByName(folderDto, folderName)) {
             throw new ConflictException('Same folder already exists');
         }
 
-        const folder = await this.folderRepository.createFolder(driveId, usercode, folderName, new Date, parentId);
+        const folder = await this.folderRepository.createFolder(folderDto, usercode, folderName, new Date);
         const folderId: string = folder.folderId.toString('hex');
 
-        try{
+        try {
             await fs.promises.mkdir(`${storagePath}/${driveId}/${folderId}`); 
-        }catch(error){
-            console.error(error);
+        } catch(error) {
+            console.error(error);;
             throw new InternalServerErrorException('Failed to create folder');
         }
         return {

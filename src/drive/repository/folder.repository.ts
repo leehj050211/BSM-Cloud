@@ -1,5 +1,6 @@
 import { EntityRepository, Repository } from "typeorm";
 import { Folder } from "../entity/folder.entity";
+import { FolderDto } from "../dto/folder.dto";
 
 import { v4 as getUuid } from 'uuid';
 import { InternalServerErrorException } from "@nestjs/common";
@@ -7,57 +8,57 @@ import { InternalServerErrorException } from "@nestjs/common";
 @EntityRepository(Folder)
 export class FolderRepository extends Repository<Folder> {
 
-    async getFolder(
+    async getFolderById(
         folderId: string
     ):Promise<Folder> {
         const folder = this.findOne({
-            folderId: new Buffer(folderId, 'hex')
+            folderId: folderId === 'root'? null: new Buffer(folderId, 'hex')
         })
         return folder;
     }
 
-    async getFolderByDriveId(
-        folderId: string,
-        driveId: string
+    async getFolderByFolderDto(
+        folderDto: FolderDto
     ):Promise<Folder> {
+        const {driveId, folderId} = folderDto;
         const file = this.findOne({
-            folderId: new Buffer(folderId, 'hex'),
+            folderId: folderId === 'root'? null: new Buffer(folderId, 'hex'),
             driveId: new Buffer(driveId, 'hex')
         })
         return file;
     }
 
     async getFolderByName(
-        driveId: string,
-        parentId: string|undefined,
+        folderDto: FolderDto,
         folderName: string
     ):Promise<Folder> {
+        const {driveId, folderId:parentId} = folderDto;
         const file = this.findOne({
             driveId: new Buffer(driveId, 'hex'),
-            parentId: typeof parentId != 'undefined'? new Buffer(parentId, 'hex'): null,
+            parentId: parentId === 'root'? null: new Buffer(parentId, 'hex'),
             folderName
         })
         return file;
     }
 
     async getFolderList(
-        driveId: string,
-        parentId?: string
+        folderDto: FolderDto
     ):Promise<Folder[]> {
+        const {driveId, folderId:parentId} = folderDto;
         const folderList = this.find({
             driveId: new Buffer(driveId, 'hex'),
-            parentId: parentId? new Buffer(parentId, 'hex'): null
+            parentId: parentId === 'root'? null: new Buffer(parentId, 'hex')
         })
         return folderList;
     }
 
     async createFolder(
-        driveId: string,
+        folderDto: FolderDto,
         usercode: number,
         folderName: string,
         created: Date,
-        parentId?: string
     ):Promise<Folder> {
+        const {driveId, folderId:parentId} = folderDto;
         const folderId = getUuid().replaceAll('-', '');
         const folder = this.create({
             folderId: new Buffer(folderId, 'hex'),
@@ -66,7 +67,7 @@ export class FolderRepository extends Repository<Folder> {
             folderName,
             created,
             isShare: false,
-            parentId: parentId? new Buffer(parentId, 'hex'): null
+            parentId: parentId === 'root'? null: new Buffer(parentId, 'hex')
         })
 
         try {
@@ -77,14 +78,16 @@ export class FolderRepository extends Repository<Folder> {
         }
     }
 
-    async updateFile(
+    async updateFolder(
+        folderDto: FolderDto,
         folderName: string,
         created: Date,
-        folderId?: string
     ):Promise<void> {
+        const {driveId, folderId} = folderDto;
         try {
             this.update({
-                folderId: new Buffer(folderId, 'hex')
+                driveId: new Buffer(driveId, 'hex'),
+                folderId: folderId === 'root'? null: new Buffer(folderId, 'hex')
             }, {
                 folderName,
                 created
@@ -96,11 +99,13 @@ export class FolderRepository extends Repository<Folder> {
     }
 
     async deleteFolder(
-        folderId?: string
+        folderDto: FolderDto
     ):Promise<void> {
+        const {driveId, folderId} = folderDto;
         try {
             await this.delete({
-                folderId: new Buffer(folderId, 'hex')
+                driveId: new Buffer(driveId, 'hex'),
+                folderId: folderId === 'root'? null: new Buffer(folderId, 'hex')
             })
         } catch (error) {
             console.error(error);
@@ -109,12 +114,14 @@ export class FolderRepository extends Repository<Folder> {
     }
 
     async shareFolder(
-        isShare: boolean,
-        folderId: string
+        folderDto: FolderDto,
+        isShare: boolean
     ):Promise<void> {
+        const {driveId, folderId} = folderDto;
         try {
             this.update({
-                folderId: new Buffer(folderId, 'hex')
+                driveId: new Buffer(driveId, 'hex'),
+                folderId: folderId === 'root'? null: new Buffer(folderId, 'hex')
             }, {
                 isShare
             })
