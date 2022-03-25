@@ -15,7 +15,7 @@ export class AppController {
         return;
     }
 
-    @Get('drive/:driveId')
+    @Get('drive/:driveId/:folderId?')
     @Render('drive')
     driveId() {
         return;

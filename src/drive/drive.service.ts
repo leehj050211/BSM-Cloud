@@ -151,6 +151,12 @@ export class DriveService {
         if (inputDriveId !== driveId) {
             throw new BadRequestException(`Drive doesn't match`);
         }
+        if (folderId !== 'root') {
+            // folder check
+            if (!await this.folderRepository.getFolderByFolderDto(folderDto)) {
+                throw new NotFoundException('Folder not found');
+            }
+        }
         const fileSize = parseInt(inputFile.size);
         const totalUsed = result.used + fileSize;
         if (totalUsed > result.total) {
@@ -213,6 +219,7 @@ export class DriveService {
 
         // update file
         const newFilePath = `${storagePath}/${driveId}/${folderId === 'root'? '': folderId+'/'}${newFileName}`;
+        const oldFilePath = `${storagePath}/${driveId}/${folderId === 'root'? '': folderId+'/'}${oldFileName}`;
         try {
             await fs.promises.rename(inputFile.path, newFilePath); 
         } catch (error) {
@@ -229,7 +236,7 @@ export class DriveService {
                     new Date(),
                     newFileSize
                 ),
-                fs.promises.rm(`${storagePath}/${driveId}/${oldFileName}`)
+                fs.promises.rm(oldFilePath)
             ]);
         } catch (error) {
             console.error(error);

@@ -13,13 +13,19 @@
     <main>
         <section id="file_section">
             <ul id="files">
-                <li v-for="(file, idx) in files" :class="{active:focus==file.fileId}" :onclick="`selectFile(${idx})`">
+                <li v-for="(file, idx) in files" :class="{active:focus==file.fileId}" :onclick="file.fileId?`selectFile(${idx})`:`changeDir('${file.folderId}')`">
                     <div v-if="file.isShare" class="share_file_icon"></div>
-                    <div class="file_icon">
+                    <div v-if="file.fileId" class="file_icon">
                         {{file.fileName.split('.')[file.fileName.split('.').length-1]}}
                     </div>
-                    <div class="file_name">
+                    <div v-if="file.fileId" class="file_name">
                         {{file.fileName}}
+                    </div>
+                    <div v-if="file.folderId" class="file_icon">
+                        Folder
+                    </div>
+                    <div v-if="file.folderId" class="file_name">
+                        {{file.folderName}}
                     </div>
                 </li>
             </ul>

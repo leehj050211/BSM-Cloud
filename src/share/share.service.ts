@@ -26,16 +26,16 @@ export class ShareService {
         fileId?: string,
         fileCode?: string
     }) {
-        if(fileCode){
+        if (fileCode) {
             const share = await this.shareRepository.getByCodeAndTime(fileCode, new Date);
-            if(!share){
+            if (!share) {
                 throw new NotFoundException('File not found');
             }
             fileId = share.fileId.toString('hex');
         }
 
         const file = await this.fileRepository.getFileByFileId(fileId);
-        if(!file || (!file.isShare && !fileCode)){
+        if (!file || (!file.isShare && !fileCode)) {
             throw new NotFoundException('File not found');
         }
         return {
@@ -52,28 +52,28 @@ export class ShareService {
         fileId?: string,
         fileCode?: string
     }) {
-        if(fileCode){
+        if (fileCode) {
             const share = await this.shareRepository.getByCodeAndTime(fileCode, new Date);
-            if(!share){
+            if (!share) {
                 throw new NotFoundException('File not found');
             }
             fileId = share.fileId.toString('hex');
         }
         
         const file = await this.fileRepository.getFileByFileId(fileId);
-        if(!file || (!file.isShare && !fileCode)){
+        if (!file || (!file.isShare && !fileCode)) {
             throw new NotFoundException('File not found');
         }
 
-        const filepath = `${storagePath}/${file.driveId.toString('hex')}/${file.fileName.toString('hex')}`;
+        const filepath = `${storagePath}/${file.driveId.toString('hex')}/${file.folderId === null? '': file.folderId.toString('hex')+'/'}${file.fileName.toString('hex')}`;
         let fileStat;
-        try{
+        try {
             fileStat = await fs.promises.stat(filepath);
-        }catch(err){
+        } catch(err) {
             console.error(err);
-            if(err.code=='ENOENT'){
+            if (err.code=='ENOENT') {
                 throw new NotFoundException('Original file not found');
-            }else{
+            } else {
                 throw new InternalServerErrorException();
             }
         }

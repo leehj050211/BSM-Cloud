@@ -1,4 +1,4 @@
-let driveId;
+let driveId, folderId;
 
 const filesView = Vue.createApp({
     data() {
@@ -24,7 +24,7 @@ const fileInfoView = Vue.createApp({
         }
     },
     methods: {
-        formatBytes: function(bytes){
+        formatBytes: function(bytes) {
             return formatBytes(bytes);
         }
     }
@@ -43,20 +43,24 @@ const fileShareView = Vue.createApp({
 const loadDriveId = () => {
     progress(20);
     driveId = window.location.pathname.split('/')[2];
+    folderId = window.location.pathname.split('/')[3];
+    if (folderId === undefined || folderId == '') {
+        folderId = 'root';
+    }
     if (driveId) {
         loadFiles();
         return;
     }
     ajax({
         method: 'get',
-        url: 'drive',
+        url: 'drive/',
         callBack: data => {
             driveId = data.driveId;
             history.pushState(null, null, `/drive/${driveId}`);
             loadFiles();
         },
         errorCallback: data => {
-            if(data.statusCode==404){
+            if (data.statusCode==404) {
                 $('.dim.no_popup_close').classList.add('on');
                 $('#create_drive_box').classList.add('on');
                 return true;
@@ -69,10 +73,14 @@ const loadFiles = () => {
     progress(50);
     ajax({
         method: 'get',
-        url: `drive/${driveId}`,
+        url: `drive/${driveId}/${folderId}`,
         callBack: data => {
+            history.pushState(null, null, `/drive/${driveId}/${folderId}`);
             $('#total_used_bar div').style.width = `${(data.used/data.total)*100}%`;
-            filesView.files = data.files;
+            filesView.files = [
+                ...data.folders,
+                ...data.files
+            ];
             fileInfoView.drive = {
                 total: data.total,
                 used: data.used
@@ -89,7 +97,7 @@ const createDriveBoxView = Vue.createApp({
         }
     },
     methods: {
-        changeStep:function(step){
+        changeStep:function(step) {
             this.step=step;
         }
     }
