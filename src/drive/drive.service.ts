@@ -74,9 +74,10 @@ export class DriveService {
         const used = result.used;
 
 
-        const [filesInfo, foldersInfo] = await Promise.all([
+        const [filesInfo, foldersInfo, dir] = await Promise.all([
             this.fileRepository.getFileListByFolderDto(folderDto),
-            this.folderRepository.getFolderList(folderDto)
+            this.folderRepository.getFolderList(folderDto),
+            this.folderRepository.getDir(folderDto),
         ]);
         const files = filesInfo.map(file => {
             return {
@@ -99,7 +100,13 @@ export class DriveService {
             files,
             folders,
             total,
-            used
+            used,
+            dir: dir.map(e => {
+                return {
+                    folderId: e.folderId.toString('hex'),
+                    folderName: e.folderName
+                }
+            })
         };
     }
 
@@ -119,8 +126,21 @@ export class DriveService {
         if (!file) {
             throw new NotFoundException('File not found');
         }
-        
-        const filePath = `${storagePath}/${driveId}/${folderId === 'root'? '': folderId+'/'}${file.fileName.toString('hex')}`;
+
+        let dirInfo: {folderId: Buffer, folderName: string}[] = [];
+        let dir = '';
+        if (folderId !== 'root') {
+            // folder check
+            dirInfo = await this.folderRepository.getDir(fileDto);
+            if (!dirInfo) {
+                throw new NotFoundException('Folder not found');
+            }
+            dir = dirInfo.map(e => {
+                return e.folderId.toString('hex');
+            }).join('/');
+        }
+
+        const filePath = `${storagePath}/${driveId}/${folderId === 'root'? '': dir+'/'}${file.fileName.toString('hex')}`;
         let fileStat;
         try {
             fileStat = await fs.promises.stat(filePath);
@@ -151,12 +171,6 @@ export class DriveService {
         if (inputDriveId !== driveId) {
             throw new BadRequestException(`Drive doesn't match`);
         }
-        if (folderId !== 'root') {
-            // folder check
-            if (!await this.folderRepository.getFolderByFolderDto(folderDto)) {
-                throw new NotFoundException('Folder not found');
-            }
-        }
         const fileSize = parseInt(inputFile.size);
         const totalUsed = result.used + fileSize;
         if (totalUsed > result.total) {
@@ -167,11 +181,23 @@ export class DriveService {
             }
             throw new BadRequestException('No more storage space');
         }
+        let dirInfo: {folderId: Buffer, folderName: string}[] = [];
+        let dir = '';
+        if (folderId !== 'root') {
+            // folder check
+            dirInfo = await this.folderRepository.getDir(folderDto);
+            if (!dirInfo) {
+                throw new NotFoundException('Folder not found');
+            }
+            dir = dirInfo.map(e => {
+                return e.folderId.toString('hex');
+            }).join('/');
+        }
 
         const file = await this.fileRepository.uploadFile(folderDto, usercode, inputFile.originalname, inputFile.filename, new Date(), fileSize);
         const fileId: string = file.fileId.toString('hex');
 
-        const newFilePath = `${storagePath}/${driveId}/${folderId === 'root'? '': folderId+'/'}${inputFile.filename}`;
+        const newFilePath = `${storagePath}/${driveId}/${folderId === 'root'? '': dir+'/'}${inputFile.filename}`;
         try {
             await Promise.all([
                 this.driveRepository.updateTotalUsed(driveId, totalUsed),
@@ -216,10 +242,22 @@ export class DriveService {
             }
             throw new BadRequestException('No more storage space');
         }
+        let dirInfo: {folderId: Buffer, folderName: string}[] = [];
+        let dir = '';
+        if (folderId !== 'root') {
+            // folder check
+            dirInfo = await this.folderRepository.getDir(fileDto);
+            if (!dirInfo) {
+                throw new NotFoundException('Folder not found');
+            }
+            dir = dirInfo.map(e => {
+                return e.folderId.toString('hex');
+            }).join('/');
+        }
 
         // update file
-        const newFilePath = `${storagePath}/${driveId}/${folderId === 'root'? '': folderId+'/'}${newFileName}`;
-        const oldFilePath = `${storagePath}/${driveId}/${folderId === 'root'? '': folderId+'/'}${oldFileName}`;
+        const newFilePath = `${storagePath}/${driveId}/${folderId === 'root'? '': dir+'/'}${newFileName}`;
+        const oldFilePath = `${storagePath}/${driveId}/${folderId === 'root'? '': dir+'/'}${oldFileName}`;
         try {
             await fs.promises.rename(inputFile.path, newFilePath); 
         } catch (error) {
@@ -265,9 +303,22 @@ export class DriveService {
         const fileName = file.fileName.toString('hex');
         const totalUsed = result.used - file.size;
 
+        let dirInfo: {folderId: Buffer, folderName: string}[] = [];
+        let dir = '';
+        if (folderId !== 'root') {
+            // folder check
+            dirInfo = await this.folderRepository.getDir(fileDto);
+            if (!dirInfo) {
+                throw new NotFoundException('Folder not found');
+            }
+            dir = dirInfo.map(e => {
+                return e.folderId.toString('hex');
+            }).join('/');
+        }
+
         // delete file
         await this.fileRepository.deleteFile(fileDto);
-        const filePath = `${storagePath}/${driveId}/${folderId === 'root'? '': folderId+'/'}${fileName}`;
+        const filePath = `${storagePath}/${driveId}/${folderId === 'root'? '': dir+'/'}${fileName}`;
         try {
             await fs.promises.rm(filePath); 
         } catch (error) {
@@ -345,12 +396,19 @@ export class DriveService {
         if (inputDriveId !== driveId) {
             throw new BadRequestException(`Drive doesn't match`);
         }
+        let dirInfo: {folderId: Buffer, folderName: string}[] = [];
+        let dir = '';
         if (parentId !== 'root') {
             // folder check
-            if (!await this.folderRepository.getFolderByFolderDto(folderDto)) {
+            dirInfo = await this.folderRepository.getDir(folderDto);
+            if (!dirInfo) {
                 throw new NotFoundException('Folder not found');
             }
+            dir = dirInfo.map(e => {
+                return e.folderId.toString('hex');
+            }).join('/');
         }
+        
         // folderName check
         if (await this.folderRepository.getFolderByName(folderDto, folderName)) {
             throw new ConflictException('Same folder already exists');
@@ -360,7 +418,7 @@ export class DriveService {
         const folderId: string = folder.folderId.toString('hex');
 
         try {
-            await fs.promises.mkdir(`${storagePath}/${driveId}/${folderId}`); 
+            await fs.promises.mkdir(`${storagePath}/${driveId}/${folderId === 'root'? '': dir+'/'}${folderId}`); 
         } catch(error) {
             console.error(error);;
             throw new InternalServerErrorException('Failed to create folder');

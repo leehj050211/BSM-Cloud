@@ -6,6 +6,7 @@ import { ShareRepository } from 'src/drive/repository/shareCode.repository';
 import * as fs from 'fs'
 import * as contentDisposition from 'content-disposition';
 import { Response } from 'express';
+import { FolderRepository } from 'src/drive/repository/folder.repository';
 
 const storagePath = `${__dirname}/${process.env.STORAGE_PATH}`;
 
@@ -15,6 +16,8 @@ export class ShareService {
     constructor(
         @InjectRepository(FileRepository)
         private fileRepository: FileRepository,
+        @InjectRepository(FolderRepository)
+        private folderRepository: FolderRepository,
         @InjectRepository(ShareRepository)
         private shareRepository: ShareRepository
     ) {}
@@ -65,7 +68,22 @@ export class ShareService {
             throw new NotFoundException('File not found');
         }
 
-        const filepath = `${storagePath}/${file.driveId.toString('hex')}/${file.folderId === null? '': file.folderId.toString('hex')+'/'}${file.fileName.toString('hex')}`;
+        const folderId = file.folderId === null? 'root': file.folderId.toString('hex');
+        const driveId = file.driveId.toString('hex');
+        let dirInfo: {folderId: Buffer, folderName: string}[] = [];
+        let dir = '';
+        if (folderId !== 'root') {
+            // folder check
+            dirInfo = await this.folderRepository.getDir({folderId, driveId});
+            if (!dirInfo) {
+                throw new NotFoundException('Folder not found');
+            }
+            dir = dirInfo.map(e => {
+                return e.folderId.toString('hex');
+            }).join('/');
+        }
+
+        const filepath = `${storagePath}/${driveId}/${folderId === 'root'? '': dir+'/'}${file.fileName.toString('hex')}`;
         let fileStat;
         try {
             fileStat = await fs.promises.stat(filepath);

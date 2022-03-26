@@ -52,6 +52,32 @@ export class FolderRepository extends Repository<Folder> {
         return folderList;
     }
 
+    async getDir(
+        folderDto: FolderDto
+    ):Promise<{folderId: Buffer, folderName: string}[]> {
+        const {driveId, folderId} = folderDto;
+        if (folderId === 'root') {
+            return [];
+        }
+        const folderList = this.query(`
+        WITH RECURSIVE CTE AS (
+            SELECT 1 AS depth, folderId, parentId, folderName
+            FROM folder
+            WHERE folderId = ? AND driveId = ?
+            
+            UNION ALL 
+            
+            SELECT depth+1 AS depth, a.folderId, a.parentId, a.folderName
+            FROM folder AS a
+            INNER JOIN CTE AS b ON a.folderId  = b.parentId 
+        )
+        SELECT * FROM CTE ORDER BY depth DESC`, [
+            new Buffer(folderId, 'hex'),
+            new Buffer(driveId, 'hex')
+        ])
+        return folderList;
+    }
+
     async createFolder(
         folderDto: FolderDto,
         usercode: number,
