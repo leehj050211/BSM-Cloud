@@ -1,5 +1,18 @@
 let driveId, folderId;
 
+
+const dirView = Vue.createApp({
+    data() {
+        return {
+            dirs: [{
+                folderName:'내 드라이브',
+                folderId:'root'
+            }],
+            dirIdx: 0
+        }
+    }
+}).mount('#dir_bar #dirs');
+
 const filesView = Vue.createApp({
     data() {
         return {
@@ -8,6 +21,7 @@ const filesView = Vue.createApp({
         }
     }
 }).mount('#file_section #files');
+
 const fileInfoView = Vue.createApp({
     data() {
         return {
@@ -29,6 +43,7 @@ const fileInfoView = Vue.createApp({
         }
     }
 }).mount('#file_info_bar');
+
 const fileShareView = Vue.createApp({
     data() {
         return {
@@ -41,7 +56,6 @@ const fileShareView = Vue.createApp({
 }).mount('#share_file_box');
 
 const loadDriveId = () => {
-    progress(20);
     driveId = window.location.pathname.split('/')[2];
     folderId = window.location.pathname.split('/')[3];
     if (folderId === undefined || folderId == '') {
@@ -51,6 +65,7 @@ const loadDriveId = () => {
         loadFiles();
         return;
     }
+    progress(20);
     ajax({
         method: 'get',
         url: 'drive/',
@@ -70,13 +85,21 @@ const loadDriveId = () => {
 }
 
 const loadFiles = () => {
-    progress(50);
+    progress(20);
     ajax({
         method: 'get',
         url: `drive/${driveId}/${folderId}`,
         callBack: data => {
             history.pushState(null, null, `/drive/${driveId}/${folderId}`);
             $('#total_used_bar div').style.width = `${(data.used/data.total)*100}%`;
+            dirView.dirs = [
+                {
+                    folderName:'내 드라이브',
+                    folderId:'root'
+                },
+                ...data.dir
+            ];
+            dirView.dirIdx = data.dir.length;
             filesView.files = [
                 ...data.folders,
                 ...data.files

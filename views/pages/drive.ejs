@@ -12,11 +12,23 @@
 <body>
     <main>
         <section id="file_section">
+            <header id="dir_bar">
+                <ol id="dirs">
+                    <li v-for="(dir, idx) in dirs" class="dir">
+                        <div class="arrow">
+                            >
+                        </div>
+                        <div class="folder_name" :onclick="`changeDir(${idx})`">
+                            {{dir.folderName}}
+                        </div>
+                    </li>
+                </ol>
+            </header>
             <ul id="files">
-                <li v-for="(file, idx) in files" :class="{active:focus==file.fileId}" :onclick="file.fileId?`selectFile(${idx})`:`changeDir('${file.folderId}')`">
+                <li v-for="(file, idx) in files" :class="{active:focus==file.fileId}" :onclick="file.fileId?`selectFile(${idx})`:`enterDir('${file.folderId}', '${file.folderName}')`">
                     <div v-if="file.isShare" class="share_file_icon"></div>
                     <div v-if="file.fileId" class="file_icon">
-                        {{file.fileName.split('.')[file.fileName.split('.').length-1]}}
+                        {{file.fileName.split('.')[file.fileName.split('.').length-1].toUpperCase()}}
                     </div>
                     <div v-if="file.fileId" class="file_name">
                         {{file.fileName}}

@@ -19,6 +19,7 @@ const progress = per => {
                 window.setTimeout(() => {
                     progressBarFlag-=1;
                     if (progressBarFlag<1) {
+                        progressBarFlag = 0;
                         progressBar.classList.remove('on');
                         progressBar.classList.remove('remove');
                     }

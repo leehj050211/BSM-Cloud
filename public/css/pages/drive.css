@@ -5,6 +5,53 @@ main{
     height:100%;
 }
 
+/* dir bar start*/
+
+#dir_bar{
+    width:100%;
+    background-color:var(--level-2);
+}
+#dirs{
+    padding:1.25rem;
+    display:flex;
+    overflow-x:auto;
+    white-space:nowrap;
+}
+#dirs::-webkit-scrollbar{
+    height:.8rem;
+}
+#dirs::-webkit-scrollbar-thumb{
+    background-color:rgb(192,192,192);
+    border-radius:1rem;    
+}
+#dirs::-webkit-scrollbar-track{
+    background-color:rgba(0,0,0,0);
+}
+.dir{
+    display:flex;
+    font-size:2.4rem;
+    user-select:none;
+}
+.dir .folder_name{
+    padding:.75rem 1rem;
+    font-weight:bold;
+    transition:.25s;
+    border-radius:1rem;
+    cursor:pointer;
+}
+.dir .folder_name:hover{
+    background-color:var(--hover);
+}
+.dir .arrow{
+    padding:.75rem;
+    font-weight:bold;
+}
+.dir:first-child .arrow{
+   display:none; 
+}
+
+/* dir bar end */
+
 /* file section start*/
 #file_section{
     width:100%;
@@ -16,7 +63,7 @@ main{
 }
 #file_section::-webkit-scrollbar-thumb{
     background-color:rgb(192,192,192);
-    border-radius:10px;    
+    border-radius:1rem;    
 }
 #file_section::-webkit-scrollbar-track{
     background-color:rgba(0,0,0,0);
@@ -61,10 +108,11 @@ main{
     flex:1;
     font-weight:bold;
     font-size:3rem;
+    user-select:none;
 }
 .file_name{
     width:100%;
-    padding:1.25rem 1rem;
+    padding:1rem 1.5rem;
     background-color:var(--level-2);
     overflow:hidden;
     text-overflow:ellipsis;
@@ -193,6 +241,18 @@ screen and (min-width:0px) and (max-width:550px){
     main{
         flex-direction:column;
         justify-content:space-between;
+    }
+    #dirs{
+        padding:.5rem;
+    }
+    .dir{
+        font-size:2rem;
+    }
+    .dir .folder_name{
+        padding:.5rem 1rem;
+    }
+    .dir .arrow{
+        padding:.5rem;
     }
     #file_section{
         flex:1;

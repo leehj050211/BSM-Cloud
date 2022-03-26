@@ -38,7 +38,7 @@ const uploadFile = (file, fileId) => {
 const downloadFile = async (fileId) => {
     ajax({
         method:'get',
-        url:`/drive/${driveId}/${fileId}/${folderId}`,
+        url:`/drive/${driveId}/${folderId}/${fileId}`,
         rawResPass:true,
         config:{
             responseType:'blob',
@@ -147,8 +147,31 @@ const shareFileCode = async (fileId) => {
     })
 }
 
-const changeDir = (dir) => {
-    progress(50);
-    folderId = dir;
+const refreshDir = () => {
+    
+    folderId = dirView.dirs[dirView.dirIdx].folderId;
     loadFiles();
+}
+
+const changeDir = (idx) => {
+    dirView.dirIdx = idx;
+    refreshDir();
+}
+
+const enterDir = (folderId, folderName) => {
+    dirView.dirs[dirView.dirIdx+1] = {
+        folderName,
+        folderId
+    };
+    dirView.dirIdx++;
+    refreshDir();
+}
+
+const exitDir = () => {
+    if (dirView.dirIdx < 1) {
+        return;
+    }
+    dirView.dirIdx--;
+    dirView.dirs.splice(dirView.dirIdx+1, dirView.dirs.length);
+    refreshDir();
 }
