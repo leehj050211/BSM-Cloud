@@ -9,13 +9,15 @@ main{
 
 #dir_bar{
     width:100%;
-    background-color:var(--level-2);
+    background-color:var(--level-1);
+    box-shadow:var(--shadow);
 }
 #dirs{
     padding:1.25rem;
     display:flex;
     overflow-x:auto;
     white-space:nowrap;
+    scroll-behavior:smooth;
 }
 #dirs::-webkit-scrollbar{
     height:.8rem;
@@ -45,10 +47,14 @@ main{
 .dir .arrow{
     padding:.75rem;
     font-weight:bold;
+    color:var(--text-level-3);
 }
 .dir:first-child .arrow{
    display:none; 
 }
+.dir:not(:last-child) .folder_name{
+    color:var(--text-level-2);
+ }
 
 /* dir bar end */
 
@@ -72,6 +78,7 @@ main{
     display:grid;
     grid-template-columns:repeat(auto-fill, minmax(25rem, 1fr));
     gap:1rem;
+    margin-top:1rem;
 }
 
 #files li{
@@ -217,23 +224,63 @@ main{
 }
 /* file info end */
 
-#file_upload{
+#upload_button{
+    display:flex;
     position:fixed;
     bottom:2rem;
     left:2rem;
+    user-select:none;
+}
+#upload_button .icon{
+    width:6rem;
+    height:6rem;
+    bottom:0;
     transition:.25s;
     border-radius:50%;
     background-color:var(--level-2);
     box-shadow:var(--shadow);
+    padding:1rem;
+    cursor:pointer;
 }
-#file_upload div{
-    padding:3rem;
-    background-image:url('/resource/common/images/x.svg');
-    background-repeat:no-repeat;
-    background-size:4rem;
-    background-position:center;
+#upload_button .icon object{
+    width:100%;
+    height:100%;
     transform:rotate(-45deg);
-    filter:var(--bright);
+}
+#upload_menus{
+    opacity:0;
+    pointer-events:none;
+    position:absolute;
+    bottom:0;
+    width:12rem;
+    background-color:var(--level-2);
+    border-radius:1rem;
+    overflow:hidden;
+    transition:.25s;
+}
+#upload_button:hover #upload_menus{
+    opacity:1;
+    animation:upload_menu 100ms ease;
+    animation-fill-mode: forwards;
+}
+@keyframes upload_menu{
+    99%{}
+    100%{
+        pointer-events:visible;
+    }
+}
+#upload_menus .menu{
+    padding:1rem 1.5rem;
+    font-size:1.8rem;
+    font-weight:bold;
+    transition:.25s;
+    cursor:pointer;
+}
+#upload_menus .menu:hover{
+    background-color:var(--hover);
+}
+#upload_menus .menu label{
+    cursor:pointer;
 }
 
 @media screen and (min-width:0px) and (max-width:780px) and (min-height:0px) and (min-height:500px),
@@ -260,12 +307,15 @@ screen and (min-width:0px) and (max-width:550px){
     #files{
         margin-bottom:1rem;
     }
-    #file_upload{
+    #upload_button{
         position:absolute;
         bottom:auto;
         left:auto;
         top:-7.5rem;
         right:1.5rem;
+    }
+    #upload_menus{
+        right:0;
     }
     #file_top_bar, #file_info, #drive_info{
         padding:1.5rem;

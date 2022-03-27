@@ -21,6 +21,9 @@ a, abbr, acronym, address, applet, article, aside, audio, b, big, blockquote, bo
 
   --main: #77a3f5;
   --text: #202124;
+  --text-level-1: #505154;
+  --text-level-2: #808184;
+  --text-level-3: #b0b1b4;
   --background: #f9f9f9;
 
   --level-1: #f9f9f9;
@@ -47,6 +50,9 @@ a, abbr, acronym, address, applet, article, aside, audio, b, big, blockquote, bo
 
   --main: #4682B4;
   --text: #e8eaed;
+  --text-level-1: #b8babd;
+  --text-level-2: #888a8d;
+  --text-level-3: #585a5d;
   --background: #202124;
 
   --level-1: #303134;
@@ -328,6 +334,9 @@ input[type=file]{
 }
 .popup.main{
   width:37.5rem;
+}
+.popup.main .input_text{
+  width:100% !important;
 }
 @keyframes popup_show {
   from {

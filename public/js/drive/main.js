@@ -1,7 +1,45 @@
 const selectFile = fileIdx => {
+    if (fileIdx == -1) {
+        filesView.focus = -1;
+        fileInfoView.file = {
+            fileName: '',
+            fileId: '',
+            created: ''
+        }
+        return;
+    }
     filesView.focus = filesView.files[fileIdx].fileId;
     fileInfoView.file = filesView.files[fileIdx];
     fileShareView.file = filesView.files[fileIdx];
+}
+
+const refreshDir = () => {
+    folderId = dirView.dirs[dirView.dirIdx].folderId;
+    loadFiles();
+    selectFile(-1);
+}
+
+const changeDir = (idx) => {
+    dirView.dirIdx = idx;
+    refreshDir();
+}
+
+const enterDir = (folderId, folderName) => {
+    dirView.dirs[dirView.dirIdx+1] = {
+        folderName,
+        folderId
+    };
+    dirView.dirIdx++;
+    refreshDir();
+}
+
+const exitDir = () => {
+    if (dirView.dirIdx < 1) {
+        return;
+    }
+    dirView.dirIdx--;
+    dirView.dirs.splice(dirView.dirIdx+1, dirView.dirs.length);
+    refreshDir();
 }
 
 const uploadFile = (file, fileId) => {
@@ -12,7 +50,7 @@ const uploadFile = (file, fileId) => {
     const method = !fileId? 'post': 'put';
     let form = new FormData();
     form.append('file', file);
-    showToast('업로드 중입니다. 파일 크기에 따라 시간이 다소 소요될 수 있습니다.');
+    showToast('업로드 중입니다. 시간이 다소 소요될 수 있습니다.');
     ajax({
         method:method,
         payload:form,
@@ -21,9 +59,7 @@ const uploadFile = (file, fileId) => {
             timeout:0,
             onUploadProgress: event => {
                 let percent = (event.loaded*100)/event.total;
-                if (percent==100) {
-                    showToast('업로드 완료. 준비 중입니다 잠시 기다려주세요.');
-                } else {
+                if (percent != 100) {
                     progress(percent);
                 }
             }
@@ -53,7 +89,7 @@ const downloadFile = async (fileId) => {
             }
         },
         callBack:(res) => {
-            showToast('다운로드 중입니다. 파일 크기에 따라 시간이 다소 소요될 수 있습니다.');
+            showToast('다운로드 중입니다. 시간이 다소 소요될 수 있습니다.');
             let filename;
             if (res.headers["content-disposition"].indexOf("filename*=UTF-8''")<0) {
                 filename = res.headers["content-disposition"].split("filename=")[1].replace(/"/g, "");
@@ -82,12 +118,7 @@ const deleteFile = async (fileId) => {
         callBack:() => {
             showToast("파일이 삭제되었습니다");
             loadFiles();
-            filesView.focus = -1;
-            fileInfoView.file = {
-                fileName: '',
-                fileId: '',
-                created: ''
-            }
+            selectFile(-1);
         }
     })
 }
@@ -111,12 +142,7 @@ const shareFile = async (fileId, flag) => {
         callBack:() => {
             showToast("파일 공유 설정이 변경되었습니다");
             loadFiles();
-            filesView.focus = -1;
-            fileInfoView.file = {
-                fileName: '',
-                fileId: '',
-                created: ''
-            }
+            selectFile(-1);
             popupClose($('#share_file_box'));
             if (flag) {
                 const fileUrl = `https://drive.bssm.kro.kr/share/${fileId}`;
@@ -136,9 +162,9 @@ const shareFileCode = async (fileId) => {
     ajax({
         method:'post',
         url:`drive/code/${driveId}/${folderId}/${fileId}`,
-        callBack:data=>{
+        callBack:(data) => {
             showToast("간편 공유가 완료되었습니다");
-            popupClose($('#share_file_box'))
+            popupClose($('#share_file_box'));
             const shareCode = data.shareCode;
             navigator.clipboard.writeText(shareCode);
             $('#share_file_code').innerText = shareCode;
@@ -147,31 +173,24 @@ const shareFileCode = async (fileId) => {
     })
 }
 
-const refreshDir = () => {
-    
-    folderId = dirView.dirs[dirView.dirIdx].folderId;
-    loadFiles();
-}
-
-const changeDir = (idx) => {
-    dirView.dirIdx = idx;
-    refreshDir();
-}
-
-const enterDir = (folderId, folderName) => {
-    dirView.dirs[dirView.dirIdx+1] = {
-        folderName,
-        folderId
-    };
-    dirView.dirIdx++;
-    refreshDir();
-}
-
-const exitDir = () => {
-    if (dirView.dirIdx < 1) {
+const createFolderBox = $('#create_folder_box');
+createFolderBox.onsubmit = (event) => {
+    event.preventDefault();
+    const folderName = event.target?.create_folder_name?.value;
+    if (folderName === undefined) {
+        showToast('알 수 없는 에러가 발생하였습니다');
         return;
     }
-    dirView.dirIdx--;
-    dirView.dirs.splice(dirView.dirIdx+1, dirView.dirs.length);
-    refreshDir();
+    ajax({
+        method:'post',
+        url:`drive/folder/${driveId}/${folderId}`,
+        payload:{
+            folderName
+        },
+        callBack:() => {
+            showToast("폴더가 생성되었습니다.");
+            popupClose(createFolderBox);
+            loadFiles();
+        }
+    })
 }

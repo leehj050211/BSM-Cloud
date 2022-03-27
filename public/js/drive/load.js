@@ -1,5 +1,5 @@
 let driveId, folderId;
-
+const dirBar = $('#dirs');
 
 const dirView = Vue.createApp({
     data() {
@@ -10,6 +10,11 @@ const dirView = Vue.createApp({
             }],
             dirIdx: 0
         }
+    },
+    updated() {
+        this.$nextTick(function() {
+            dirBar.scrollLeft = dirBar.scrollWidth;
+        })
     }
 }).mount('#dir_bar #dirs');
 

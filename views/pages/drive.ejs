@@ -43,10 +43,22 @@
             </ul>
         </section>
         <aside id="file_info_bar">
-            <label id="file_upload" for="upload_input" class="clear_button">
-                <input id="upload_input" type="file" onchange="uploadFile(this.files[0]);this.value=''">
-                <div></div>
-            </label>
+            <div id="upload_button">
+                <div class="icon">
+                    <object data="/resource/common/images/x.svg"></object>
+                </div>
+                <ul id="upload_menus">
+                    <li class="menu">
+                        <label for="upload_input">
+                            파일 업로드
+                            <input id="upload_input" type="file" onchange="uploadFile(this.files[0]);this.value=''">
+                        </label>
+                    </li>
+                    <li class="menu" onclick="popupOpen($('#create_folder_box'))">
+                        폴더 생성
+                    </li>
+                </ul>
+            </div>
             <div id="file_top_bar">
                 <h2 v-if="file.fileName">{{file.fileName}}</h2>
                 <h2 v-if="!file.fileName">선택된 파일 없음</h2>
@@ -122,7 +134,7 @@
         </div>
         
         <div id="share_file_box" class="popup main center">
-            <div class="popup_close_button x_button" onClick="popupClose(this.parentElement);$('.dim.no_popup_close').classList.remove('on');"></div>
+            <div class="popup_close_button x_button" onClick="popupClose(this.parentElement);"></div>
             <h2>파일 공유</h2>
             <h4>일반 공유</h4><br>
             <p>파일을 공유할 수 있는 링크가 생성됩니다</p>
@@ -135,7 +147,7 @@
         </div>
 
         <div id="share_file_code_box" class="popup main center">
-            <div class="popup_close_button x_button" onClick="popupClose(this.parentElement);$('.dim.no_popup_close').classList.remove('on');"></div>
+            <div class="popup_close_button x_button" onClick="popupClose(this.parentElement);"></div>
             <h2>간편 공유 완료</h2>
             <p>코드가 클립보드에 복사되었습니다.</p>
             <p>아래의 코드는 2분동안 사용가능 합니다</p>
@@ -143,13 +155,22 @@
         </div>
 
         <div id="file_url_box" class="popup main center">
-            <div class="popup_close_button x_button" onClick="popupClose(this.parentElement);$('.dim.no_popup_close').classList.remove('on');"></div>
+            <div class="popup_close_button x_button" onClick="popupClose(this.parentElement);"></div>
             <h2>공유 완료</h2>
             <p>링크가 클립보드에 복사되었습니다.</p>
             <details>
                 <summary>공유된 파일 링크</summary>
                 <a href="" target="blank" id="share_file_url"></a>
             </details>
+        </div>
+
+        <div id="create_folder_box" class="popup main center">
+            <div class="popup_close_button x_button" onClick="popupClose(this.parentElement);"></div>
+            <form>
+                <h2>폴더 생성</h2>
+                <input id="create_folder_name" class="input_text" type="text" placeholder="폴더 이름" required>
+                <button type="submit" class="main_button button">폴더 생성</button>
+            </form>
         </div>
     </div>
     <%- include('../common/common') %>
