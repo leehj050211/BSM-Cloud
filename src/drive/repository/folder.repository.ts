@@ -61,17 +61,17 @@ export class FolderRepository extends Repository<Folder> {
         }
         const folderList = this.query(`
         WITH RECURSIVE CTE AS (
-            SELECT 1 AS depth, folderId, parentId, folderName
+            SELECT 1 AS idx, folderId, parentId, folderName
             FROM folder
             WHERE folderId = ? AND driveId = ?
             
             UNION ALL 
             
-            SELECT depth+1 AS depth, a.folderId, a.parentId, a.folderName
+            SELECT idx+1 AS idx, a.folderId, a.parentId, a.folderName
             FROM folder AS a
             INNER JOIN CTE AS b ON a.folderId  = b.parentId 
         )
-        SELECT * FROM CTE ORDER BY depth DESC`, [
+        SELECT * FROM CTE ORDER BY idx DESC`, [
             new Buffer(folderId, 'hex'),
             new Buffer(driveId, 'hex')
         ])
@@ -150,6 +150,24 @@ export class FolderRepository extends Repository<Folder> {
                 folderId: folderId === 'root'? null: new Buffer(folderId, 'hex')
             }, {
                 isShare
+            })
+        } catch (error) {
+            console.error(error);
+            throw new InternalServerErrorException();
+        }
+    }
+
+    async moveFolder(
+        folderDto: FolderDto,
+        parentId: string
+    ):Promise<void> {
+        const {driveId, folderId} = folderDto;
+        try {
+            this.update({
+                driveId: new Buffer(driveId, 'hex'),
+                folderId: new Buffer(folderId, 'hex')
+            }, {
+                parentId: parentId === 'root'? null: new Buffer(parentId, 'hex')
             })
         } catch (error) {
             console.error(error);

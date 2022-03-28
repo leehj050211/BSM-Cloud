@@ -95,12 +95,12 @@ export class DriveController {
         return this.driveService.createFolder(user.memberCode, FolderDto, folderName);
     }
 
-    // @Put('upload/:driveId/:fileId')
-    // updateFolder(
-    //     @GetUser() user: User,
-    //     @Param() FileDto,
-    //     @Body('folderName')
-    // ) {
-    //     return this.driveService.updateFile(user.memberCode, FileDto, inputFile);
-    // }
+    @Post('move/:driveId/:folderId')
+    moveFolder(
+        @GetUser() user: User,
+        @Param() FolderDto,
+        @Body('newFolderId') newFolderId: string
+    ) {
+        return this.driveService.moveFolder(user.memberCode, FolderDto, newFolderId);
+    }
 }

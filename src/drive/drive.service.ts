@@ -36,7 +36,7 @@ export class DriveService {
         try {
             await fs.promises.mkdir(`${storagePath}/${driveId}`); 
         } catch(error) {
-            console.error(error);;
+            console.error(error);
             throw new InternalServerErrorException('Failed to create drive');
         }
 
@@ -420,11 +420,73 @@ export class DriveService {
         try {
             await fs.promises.mkdir(`${storagePath}/${driveId}/${folderId === 'root'? '': dir+'/'}${folderId}`); 
         } catch(error) {
-            console.error(error);;
+            console.error(error);
             throw new InternalServerErrorException('Failed to create folder');
         }
         return {
             folderId
         };
+    }
+
+    async moveFolder(usercode: number, folderDto: FolderDto, newFolderId: string) {
+        const {driveId: inputDriveId, folderId: oldFolderId} = folderDto;
+        if (oldFolderId === newFolderId) {
+            throw new ConflictException('Same directory');
+        }
+        // driveId check
+        const drive = await this.driveRepository.getDriveByUsercode(usercode);
+        if (!drive) {
+            throw new NotFoundException('Drive not found');
+        }
+        const driveId = drive.id.toString('hex');
+        if (inputDriveId !== driveId) {
+            throw new BadRequestException(`Drive doesn't match`);
+        }
+
+        let oldDirInfo: {folderId: Buffer, folderName: string}[] = [];
+        let newDirInfo: {folderId: Buffer, folderName: string}[] = [];
+        let oldDir = '';
+        let newDir = '';
+        let oldFolderName = '';
+
+        // folder check
+        if (newFolderId !== 'root') {
+            [oldDirInfo, newDirInfo] = await Promise.all([
+                this.folderRepository.getDir(folderDto),
+                this.folderRepository.getDir({driveId, folderId: newFolderId})
+            ]);
+            if (!newDirInfo) {
+                throw new NotFoundException('Folder not found');
+            }
+            newDir = newDirInfo.map(e => {
+                return e.folderId.toString('hex');
+            }).join('/');
+        } else {
+            oldDirInfo = await this.folderRepository.getDir(folderDto);
+        }
+        if (!oldDirInfo) {
+            throw new NotFoundException('Folder not found');
+        }
+        oldDir = oldDirInfo.map(e => {
+            return e.folderId.toString('hex');
+        }).join('/');
+        oldFolderName = oldDirInfo[oldDirInfo.length-1].folderName;
+
+        // folderName check
+        if (await this.folderRepository.getFolderByName({driveId, folderId: newFolderId}, oldFolderName)) {
+            throw new ConflictException('Same folder already exists');
+        }
+
+        const oldFolderPath = `${storagePath}/${driveId}/${oldDir}`;
+        const newFolderPath = `${storagePath}/${driveId}/${newFolderId === 'root'? '': newDir+'/'}${oldFolderId}`;
+        try {
+            await Promise.all([
+                await this.folderRepository.moveFolder(folderDto, newFolderId),
+                await fs.promises.rename(oldFolderPath, newFolderPath)
+            ]);
+        } catch(error) {
+            console.error(error);
+            throw new InternalServerErrorException('Failed to move folder');
+        }
     }
 }
