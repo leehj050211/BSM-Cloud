@@ -329,6 +329,66 @@ export class DriveService {
         return;
     }
 
+    async moveFile(usercode: number, fileDto: FileDto, newFolderId: string) {
+        const {driveId: inputDriveId, folderId: oldFolderId} = fileDto;
+        if (oldFolderId === newFolderId) {
+            throw new ConflictException('Same directory');
+        }
+        // driveId check
+        const drive = await this.driveRepository.getDriveByUsercode(usercode);
+        if (!drive) {
+            throw new NotFoundException('Drive not found');
+        }
+        const driveId = drive.id.toString('hex');
+        if (inputDriveId !== driveId) {
+            throw new BadRequestException(`Drive doesn't match`);
+        }
+
+        // file check
+        const file = await this.fileRepository.getFileByFileDto(fileDto);
+        if (!file) {
+            throw new NotFoundException('File not found');
+        }
+        const fileName = file.fileName.toString('hex');
+
+        let oldDirInfo: {folderId: Buffer, folderName: string}[] = [];
+        let newDirInfo: {folderId: Buffer, folderName: string}[] = [];
+        let oldDir = '';
+        let newDir = '';
+
+        // folder check
+        if (oldFolderId !== 'root') {
+            oldDirInfo = await this.folderRepository.getDir({driveId, folderId: oldFolderId});
+            if (!oldDirInfo.length) {
+                throw new NotFoundException('Folder not found');
+            }
+            oldDir = oldDirInfo.map(e => {
+                return e.folderId.toString('hex');
+            }).join('/');
+        }
+        if (newFolderId !== 'root') {
+            newDirInfo = await this.folderRepository.getDir({driveId, folderId: newFolderId});
+            if (!newDirInfo.length) {
+                throw new NotFoundException('Folder not found');
+            }
+            newDir = newDirInfo.map(e => {
+                return e.folderId.toString('hex');
+            }).join('/');
+        }
+        
+        const oldFilePath = `${storagePath}/${driveId}/${oldFolderId === 'root'? '': oldDir+'/'}${fileName}`;
+        const newFilePath = `${storagePath}/${driveId}/${newFolderId === 'root'? '': newDir+'/'}${fileName}`;
+        try {
+            await Promise.all([
+                await this.fileRepository.moveFile(fileDto, newFolderId),
+                await fs.promises.rename(oldFilePath, newFilePath)
+            ]);
+        } catch(error) {
+            console.error(error);
+            throw new InternalServerErrorException('Failed to move folder');
+        }
+    }
+
     async shareFile(usercode: number, fileDto: FileDto, share: boolean) {
         const {driveId: inputDriveId} = fileDto;
         // driveId check
@@ -455,7 +515,7 @@ export class DriveService {
                 this.folderRepository.getDir(folderDto),
                 this.folderRepository.getDir({driveId, folderId: newFolderId})
             ]);
-            if (!newDirInfo) {
+            if (!newDirInfo.length) {
                 throw new NotFoundException('Folder not found');
             }
             newDir = newDirInfo.map(e => {
@@ -464,7 +524,7 @@ export class DriveService {
         } else {
             oldDirInfo = await this.folderRepository.getDir(folderDto);
         }
-        if (!oldDirInfo) {
+        if (!oldDirInfo.length) {
             throw new NotFoundException('Folder not found');
         }
         oldDir = oldDirInfo.map(e => {

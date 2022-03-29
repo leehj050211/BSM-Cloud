@@ -130,4 +130,22 @@ export class FileRepository extends Repository<File> {
             throw new InternalServerErrorException();
         }
     }
+
+    async moveFile(
+        fileDto: FileDto,
+        newFolderId: string
+    ):Promise<void> {
+        const {driveId, folderId} = fileDto;
+        try {
+            this.update({
+                driveId: new Buffer(driveId, 'hex'),
+                folderId: new Buffer(folderId, 'hex')
+            }, {
+                folderId: newFolderId === 'root'? null: new Buffer(newFolderId, 'hex')
+            })
+        } catch (error) {
+            console.error(error);
+            throw new InternalServerErrorException();
+        }
+    }
 }

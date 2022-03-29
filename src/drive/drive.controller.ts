@@ -69,6 +69,15 @@ export class DriveController {
         return this.driveService.deleteFile(user.memberCode, FileDto);
     }
 
+    @Post('move/:driveId/:folderId/:fileId')
+    moveFile(
+        @GetUser() user: User,
+        @Param() FileDto,
+        @Body('newFolderId') newFolderId: string
+    ) {
+        return this.driveService.moveFile(user.memberCode, FileDto, newFolderId);
+    }
+
     @Post('share/:driveId/:folderId/:fileId')
     shareFile(
         @GetUser() user: User,
