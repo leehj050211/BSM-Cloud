@@ -16,7 +16,7 @@
             <p>파일 크기: {{formatBytes(file.size)}}</p>
             <p>수정된 날짜: {{new Date(file.created).toLocaleString()}}</p>
             <div id="file_menu" v-if="file.fileId">
-                <button class="button" :onclick="`downloadFile('${file.fileId}')`">파일 다운로드</button>
+                <button class="button accent" :onclick="`downloadFile('${file.fileId}')`">파일 다운로드</button>
             </div>
         </div>
     </main>

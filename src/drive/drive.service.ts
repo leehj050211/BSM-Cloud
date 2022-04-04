@@ -181,6 +181,14 @@ export class DriveService {
             }
             throw new BadRequestException('No more storage space');
         }
+        if (inputFile.originalname.length > 255) {
+            try {
+                fs.promises.rm(inputFile.path); 
+            } catch (error) {
+                console.error(error);
+            }
+            throw new BadRequestException('File name is too long');
+        }
         let dirInfo: {folderId: Buffer, folderName: string}[] = [];
         let dir = '';
         if (folderId !== 'root') {
@@ -241,6 +249,14 @@ export class DriveService {
                 console.error(error);
             }
             throw new BadRequestException('No more storage space');
+        }
+        if (inputFile.originalname.length > 255) {
+            try {
+                fs.promises.rm(inputFile.path); 
+            } catch (error) {
+                console.error(error);
+            }
+            throw new BadRequestException('File name is too long');
         }
         let dirInfo: {folderId: Buffer, folderName: string}[] = [];
         let dir = '';
@@ -455,6 +471,9 @@ export class DriveService {
         const driveId = drive.id.toString('hex');
         if (inputDriveId !== driveId) {
             throw new BadRequestException(`Drive doesn't match`);
+        }
+        if (folderName.length > 255) {
+            throw new BadRequestException('Folder name is too long');
         }
         let dirInfo: {folderId: Buffer, folderName: string}[] = [];
         let dir = '';

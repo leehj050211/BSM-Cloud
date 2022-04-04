@@ -11,9 +11,9 @@
 </head>
 <body>
     <main>
-        <section id="file_section">
+        <section id="file_section" class="scroll_bar">
             <header id="dir_bar">
-                <ol id="dirs">
+                <ol id="dirs" class="scroll_bar">
                     <li v-for="(dir, idx) in dirs" class="dir">
                         <div class="arrow">
                             >
@@ -81,18 +81,18 @@
                     </details>
                 </div>
                 <div id="file_menu">
-                    <button class="button main_button" :onclick="`downloadFile('${file.fileId}')`">다운로드</button>
-                    <button class="button clear_button" onclick="$('#file_sub_menu').toggleAttribute('open')">더보기</button>
+                    <button class="button main_button accent" :onclick="`downloadFile('${file.fileId}')`">다운로드</button>
+                    <button class="button" onclick="$('#file_sub_menu').toggleAttribute('open')">더보기</button>
                 </div>
                 <details id="file_sub_menu">
                     <summary></summary>
                     <div>
-                        <button class="button delete_button" :onclick="`deleteFile('${file.fileId}')`">삭제</button>
-                        <label class="button clear_button">
+                        <button class="button delete" :onclick="`deleteFile('${file.fileId}')`">삭제</button>
+                        <label class="button">
                             업데이트
                             <input type="file" :onchange="`uploadFile(this.files[0], '${file.fileId}');this.value=''`">
                         </label>
-                        <button class="button clear_button" onclick="popupOpen($('#share_file_box'))">공유</button>
+                        <button class="button" onclick="popupOpen($('#share_file_box'))">공유</button>
                     </div>
                 </details>
             </div>
@@ -106,7 +106,7 @@
     </main>
     <div>
         <div id="create_drive_box" class="popup main center">
-            <form v-if="step==0" autocomplete="off" onsubmit="createDriveBoxView.changeStep(1);createDrive();return false;">
+            <form v-if="step==0" autocomplete="off" onsubmit="createDriveBoxView.changeStep(1);createDrive();event.preventDefault();">
                 <h2>환영합니다</h2>
                 <p>
                     BSM Cloud는 인터넷을 통해 언제 어디서나 접속할 수 있는 클라우드 서비스 입니다.
@@ -120,7 +120,7 @@
                         정보 제공에 동의합니다
                     </label>
                 </div>
-                <button type="submit" class="main_button button">드라이브 생성</button>
+                <button type="submit" class="button main_button accent">드라이브 생성</button>
             </form>
             <div v-if="step==1">
                 <h2>생성중...</h2>
@@ -138,8 +138,8 @@
             <h2>파일 공유</h2>
             <h4>일반 공유</h4><br>
             <p>파일을 공유할 수 있는 링크가 생성됩니다</p>
-            <button v-if="!file.isShare" class="button button_off" :onclick="`shareFile('${file.fileId}', true)`">공유 꺼짐</button>
-            <button v-else class="button button_on" :onclick="`shareFile('${file.fileId}', false)`">공유 켜짐</button>
+            <button v-if="!file.isShare" class="button off" :onclick="`shareFile('${file.fileId}', true)`">공유 꺼짐</button>
+            <button v-else class="button on" :onclick="`shareFile('${file.fileId}', false)`">공유 켜짐</button>
             <br><br>
             <h4>간편 공유</h4><br>
             <p>2분동안 사용할 수 있는 4자리의 코드가 발급되며 홈 화면에서 코드를 입력해 파일에 접근 할 수 있습니다</p>
@@ -169,7 +169,7 @@
             <form>
                 <h2>폴더 생성</h2>
                 <input id="create_folder_name" class="input_text" type="text" placeholder="폴더 이름" required>
-                <button type="submit" class="main_button button">폴더 생성</button>
+                <button type="submit" class="button main_button accent">폴더 생성</button>
             </form>
         </div>
     </div>

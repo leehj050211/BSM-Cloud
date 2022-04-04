@@ -24,7 +24,7 @@ export class Folder {
     usercode: number;
 
     @Column({
-        length: 64,
+        length: 255,
         nullable: false
     })
     folderName: string;

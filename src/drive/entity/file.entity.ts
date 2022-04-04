@@ -31,7 +31,7 @@ export class File {
     usercode: number;
 
     @Column({
-        length: 64,
+        length: 255,
         nullable: false
     })
     originalName: string;
