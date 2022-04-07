@@ -48,11 +48,10 @@
                     <object data="/resource/common/images/x.svg"></object>
                 </div>
                 <ul id="upload_menus">
-                    <li class="menu">
-                        <label for="upload_input">
-                            파일 업로드
-                            <input id="upload_input" type="file" onchange="uploadFile(this.files[0]);this.value=''">
-                        </label>
+                    <label for="upload_input" class="menu">
+                        파일 업로드
+                        <input id="upload_input" type="file" onchange="uploadFile(this.files[0]);this.value=''">
+                    </label>
                     </li>
                     <li class="menu" onclick="popupOpen($('#create_folder_box'))">
                         폴더 생성
@@ -80,21 +79,25 @@
                         <a :href="`https://drive.bssm.kro.kr/share/${file.fileId}`" target="blink">https://drive.bssm.kro.kr/share/{{file.fileId}}</a>
                     </details>
                 </div>
-                <div id="file_menu">
+                <div v-if="mode=='normal'" id="file_menu">
                     <button class="button main_button accent" :onclick="`downloadFile('${file.fileId}')`">다운로드</button>
-                    <button class="button" onclick="$('#file_sub_menu').toggleAttribute('open')">더보기</button>
+                    <span id="file_sub_menu" class="dropdown_menu">
+                        <span class="select button">더보기</span>
+                        <ul class="dropdown_content">
+                            <li class="option" onclick="popupOpen($('#share_file_box'))">파일 공유</li>
+                            <li class="option" v-on:click="changeMode('move')">파일 이동</li>
+                            <label class="option">
+                                업데이트
+                                <input type="file" :onchange="`uploadFile(this.files[0], '${file.fileId}');this.value=''`">
+                            </label>
+                            <li class="option delete" :onclick="`deleteFile('${file.fileId}')`">삭제</li>
+                        </ul>
+                    </span>
                 </div>
-                <details id="file_sub_menu">
-                    <summary></summary>
-                    <div>
-                        <button class="button delete" :onclick="`deleteFile('${file.fileId}')`">삭제</button>
-                        <label class="button">
-                            업데이트
-                            <input type="file" :onchange="`uploadFile(this.files[0], '${file.fileId}');this.value=''`">
-                        </label>
-                        <button class="button" onclick="popupOpen($('#share_file_box'))">공유</button>
-                    </div>
-                </details>
+                <div v-if="mode=='move'" id="file_menu">
+                    <button class="button main_button accent" :onclick="`moveFile('${file.fileId}')`">여기로 이동</button>
+                    <button class="button sub_button delete" v-on:click="cancleMode()">이동 취소</button>
+                </div>
             </div>
             <div id="drive_info">
                 <div id="total_used_bar">

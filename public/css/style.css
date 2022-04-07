@@ -113,6 +113,16 @@ body{
   background-size:cover;
   transition:background-color .5s;
 }
+@keyframes blocking_click{
+  0%{
+    pointer-events:none;
+  }
+  99%{
+  }
+  100%{
+    pointer-events:visible;
+  }
+}
 @font-face {
   font-family:'NotoSans';
   font-weight:normal;
@@ -218,6 +228,7 @@ summary{
   opacity:0;
   pointer-events:none;
   position: absolute;
+  z-index:1;
   text-align:center;
   font-size:1.6rem;
   font-weight:bold;
@@ -226,16 +237,16 @@ summary{
   background-color:var(--level-1);
   transition:all .25s;
 }
-.dropdown_content li{
+.dropdown_content .option{
   transition:.25s;
 }
-.dropdown_content li:first-child{
+.dropdown_content .option:first-child{
   border-radius:.5rem .5rem 0rem 0rem;
 }
-.dropdown_content li:last-child{
+.dropdown_content .option:last-child{
   border-radius:0rem 0rem .5rem .5rem;
 }
-.dropdown_content li:hover {
+.dropdown_content .option:hover {
   background-color:var(--hover);
 }
 .dropdown_content .option{
@@ -245,7 +256,7 @@ summary{
   cursor:pointer;
 }
 .dropdown_menu:hover .dropdown_content{
-  transform:translateY(0);
+  transform:translateY(0) !important;
   opacity:1;
   pointer-events:unset;
 }
@@ -254,7 +265,7 @@ summary{
 }
 .dropdown_menu > .select{
   position:relative;
-  z-index:1;
+  z-index:2;
   padding-right:2rem;
 }
 
@@ -300,6 +311,8 @@ input[type=number].year{
   width:15rem;
 }
 input[type=file]{
+  width:1px;
+  height:1px;
   position:fixed;
   opacity:0;
   pointer-events:none;
@@ -329,11 +342,11 @@ input[type=file]{
 }
 .delete, .button.off{
   color:var(--accent-text);
-  background-color:var(--red) !important;
+  background-color:var(--red);
 }
 .button.on{
   color:var(--accent-text);
-  background-color:var(--green) !important;
+  background-color:var(--green);
 }
 .inactive{
   color:var(--text) !important;

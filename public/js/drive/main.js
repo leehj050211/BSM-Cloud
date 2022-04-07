@@ -1,4 +1,7 @@
 const selectFile = fileIdx => {
+    if (fileInfoView.mode != 'normal') {
+        return;
+    }
     if (fileIdx == -1) {
         filesView.focus = -1;
         fileInfoView.file = {
@@ -191,6 +194,24 @@ createFolderBox.onsubmit = (event) => {
             showToast("폴더가 생성되었습니다.");
             popupClose(createFolderBox);
             loadFiles();
+        }
+    })
+}
+
+const moveFile = async (fileId) => {
+    if (!confirm('파일을 이동하시겠습니까?')) {
+        return;
+    }
+    ajax({
+        method:'post',
+        url:`drive/move/${driveId}/${lastFolderId}/${fileId}`,
+        payload:{
+            newFolderId:folderId
+        },
+        callBack:() => {
+            showToast("파일이 이동되었습니다");
+            fileInfoView.changeMode('normal');
+            refreshDir();
         }
     })
 }

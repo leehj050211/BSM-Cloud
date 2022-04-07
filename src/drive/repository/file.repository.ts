@@ -139,7 +139,7 @@ export class FileRepository extends Repository<File> {
         try {
             this.update({
                 driveId: new Buffer(driveId, 'hex'),
-                folderId: new Buffer(folderId, 'hex')
+                folderId: folderId === 'root'? null: new Buffer(folderId, 'hex')
             }, {
                 folderId: newFolderId === 'root'? null: new Buffer(newFolderId, 'hex')
             })

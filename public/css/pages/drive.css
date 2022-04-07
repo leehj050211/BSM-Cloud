@@ -1,322 +1,304 @@
 @charset "utf-8";
 
 main{
-    display:flex;
-    height:100%;
+    display: flex;
+    height: 100%;
 }
 
 /* dir bar start*/
 
 #dir_bar{
-    position:sticky;
-    top:0;
-    z-index:1;
-    width:100%;
-    background-color:var(--level-1);
-    box-shadow:var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    width: 100%;
+    background-color: var(--level-1);
+    box-shadow: var(--shadow);
 }
 #dirs{
-    padding:1.25rem;
-    display:flex;
-    overflow-x:auto;
-    white-space:nowrap;
-    scroll-behavior:smooth;
+    padding: 1.25rem;
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    scroll-behavior: smooth;
 }
 .dir{
-    display:flex;
-    font-size:2.4rem;
-    user-select:none;
+    display: flex;
+    font-size: 2.4rem;
+    user-select: none;
 }
 .dir .folder_name{
-    padding:.75rem 1rem;
-    font-weight:bold;
-    transition:.25s;
-    border-radius:1rem;
-    cursor:pointer;
+    padding: .75rem 1rem;
+    font-weight: bold;
+    transition: .25s;
+    border-radius: 1rem;
+    cursor: pointer;
 }
 .dir .folder_name:hover{
-    background-color:var(--hover);
+    background-color: var(--hover);
 }
 .dir .arrow{
-    padding:.75rem;
-    font-weight:bold;
-    color:var(--text-level-3);
+    padding: .75rem;
+    font-weight: bold;
+    color: var(--text-level-3);
 }
 .dir:first-child .arrow{
-   display:none; 
+   display: none; 
 }
 .dir:not(:last-child) .folder_name{
-    color:var(--text-level-2);
+    color: var(--text-level-2);
  }
 
 /* dir bar end */
 
 /* file section start*/
 #file_section{
-    width:100%;
-    display:inline-block;
-    overflow:auto;
+    width: 100%;
+    display: inline-block;
+    overflow: auto;
 }
 #files {
-    display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(25rem, 1fr));
-    gap:1rem;
-    margin-top:1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(25rem, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
 }
 
 #files li{
-    position:relative;
-    display:flex;
-    flex-direction:column;
-    width:100%;
-    height:15rem;
-    border-radius:1rem;
-    overflow:hidden;
-    background-color:var(--level-1);
-    cursor:pointer;
-    transition:.25s;
-    box-shadow:var(--shadow);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 15rem;
+    border-radius: 1rem;
+    overflow: hidden;
+    background-color: var(--level-1);
+    cursor: pointer;
+    transition: .25s;
+    box-shadow: var(--shadow);
 }
 #files li.active{
-    background-color:var(--level-2);
+    background-color: var(--level-2);
 }
-@media screen and (min-width:0px) and (max-width:900px){
+@media screen and (min-width: 0px) and (max-width: 900px){
     #files li{
-        max-width:100%;
+        max-width: 100%;
     }
 }
 
 #files li:hover{
-    background-color:var(--hover);
+    background-color: var(--hover);
 }
 
 .file_icon{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    width:100%;
-    flex:1;
-    font-weight:bold;
-    font-size:3rem;
-    user-select:none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    flex: 1;
+    font-weight: bold;
+    font-size: 3rem;
+    user-select: none;
 }
 .file_name{
-    width:100%;
-    padding:1rem 1.5rem;
-    background-color:var(--level-2);
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-    font-size:1.7rem;
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background-color: var(--level-2);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 1.7rem;
 }
 .share_file_icon{
-    position:absolute;
-    top:1rem;
-    left:1rem;
-    width:2.5rem;
-    height:2.5rem;
-    background-image:url('/resource/common/images/share.svg');
-    background-size:2.5rem;
-    background-repeat:no-repeat;
-    background-position:center;
-    filter:var(--bright);
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    background-image: url('/resource/common/images/share.svg');
+    background-size: 2.5rem;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: var(--bright);
 }
 
-@media screen and (min-width:0px) and (max-width:920px){
+@media screen and (min-width: 0px) and (max-width: 920px){
     #files{
-        grid-template-columns:repeat(auto-fill, minmax(20rem, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
     }
     #files li{
-        height:12.5rem;
+        height: 12.5rem;
     }
     .file_icon{
-        font-size:2.4rem;
+        font-size: 2.4rem;
     }
     .file_name{
-        padding:1rem;
-        font-size:1.5rem;
+        padding: 1rem;
+        font-size: 1.5rem;
     }
 }
 /* file section end */
 
 /* file info start */
 #file_info_bar{
-    position:relative;
-    min-width:40rem;
-    height:100%;
-    flex:1;
-    background-color:var(--level-1);
-    box-shadow:var(--shadow);
+    position: relative;
+    min-width: 40rem;
+    height: 100%;
+    flex: 1;
+    background-color: var(--level-1);
+    box-shadow: var(--shadow);
 }
 #file_top_bar{
-    background-color:var(--level-2);
-    border-radius:0 0 1rem 1rem;
-    box-shadow:var(--shadow);
-    padding:2rem;
+    background-color: var(--level-2);
+    border-radius: 0 0 1rem 1rem;
+    box-shadow: var(--shadow);
+    padding: 2rem;
 }
 #file_info, #drive_info{
-    padding:1.5rem 2rem;
+    padding: 1.5rem 2rem;
 }
 #file_info > p{
-    margin-bottom:.25rem;
+    margin-bottom: .25rem;
 }
 #file_info *{
-    word-break:break-all;
+    word-break: break-all;
 }
-@media screen and (min-width:0px) and (max-width:850px){
+@media screen and (min-width: 0px) and (max-width: 850px){
     #file_info_bar{
-        min-width:35rem;
+        min-width: 35rem;
     }
 }
 #file_menu{
-    display:flex;
-    gap:1rem;
-    padding:0 2rem;
-}
-#file_sub_menu{
-    padding:1rem 2rem 0 2rem;
-}
-#file_sub_menu:not([open]),
-#file_sub_menu summary{
-    display:none;
-}
-#file_sub_menu > div{
-    display:flex;
-    gap:1rem;
-}
-#file_sub_menu > div *{
-    flex:1;
+    display: flex;
+    gap: 1rem;
+    padding: 0 2rem;
 }
 
 #total_used_bar{
-    position:relative;
-    width:100%;
-    height:1rem;
-    background-color:var(--gray);
-    border-radius:1rem;
-    overflow:hidden;
-    margin-bottom:1rem;
+    position: relative;
+    width: 100%;
+    height: 1rem;
+    background-color: var(--gray);
+    border-radius: 1rem;
+    overflow: hidden;
+    margin-bottom: 1rem;
 }
 #total_used_bar div{
-    position:absolute;
-    width:0%;
-    height:1rem;
-    background-color:var(--green);
-    display:block;
-    transition:1.5s;
+    position: absolute;
+    width: 0%;
+    height: 1rem;
+    background-color: var(--green);
+    display: block;
+    transition: 1.5s;
 }
 /* file info end */
 
 #upload_button{
-    display:flex;
-    position:fixed;
-    bottom:2rem;
-    left:2rem;
-    user-select:none;
+    display: flex;
+    position: fixed;
+    bottom: 2rem;
+    left: 2rem;
+    user-select: none;
 }
 #upload_button .icon{
-    width:6rem;
-    height:6rem;
-    bottom:0;
-    transition:.25s;
-    border-radius:50%;
-    background-color:var(--level-2);
-    box-shadow:var(--shadow);
-    padding:1rem;
-    cursor:pointer;
+    width: 6rem;
+    height: 6rem;
+    bottom: 0;
+    transition: .25s;
+    border-radius: 50%;
+    background-color: var(--level-2);
+    box-shadow: var(--shadow);
+    padding: 1rem;
+    cursor: pointer;
 }
 #upload_button .icon object{
-    width:100%;
-    height:100%;
-    transform:rotate(-45deg);
+    width: 100%;
+    height: 100%;
+    transform: rotate(-45deg);
 }
 #upload_menus{
-    opacity:0;
-    pointer-events:none;
-    position:absolute;
-    bottom:0;
-    width:12rem;
-    background-color:var(--level-2);
-    border-radius:1rem;
-    overflow:hidden;
-    transition:.25s;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    bottom: 0;
+    width: 12rem;
+    background-color: var(--level-2);
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: .25s;
 }
 #upload_button:hover #upload_menus{
-    opacity:1;
-    animation:upload_menu 100ms ease;
+    opacity: 1;
+    animation: blocking_click 250ms ease;
     animation-fill-mode: forwards;
 }
-@keyframes upload_menu{
-    99%{}
-    100%{
-        pointer-events:visible;
-    }
-}
 #upload_menus .menu{
-    padding:1rem 1.5rem;
-    font-size:1.8rem;
-    font-weight:bold;
-    transition:.25s;
-    cursor:pointer;
+    display: block;
+    padding: 1rem 1.5rem;
+    font-size: 1.8rem;
+    font-weight: bold;
+    transition: .25s;
+    cursor: pointer;
 }
 #upload_menus .menu:hover{
-    background-color:var(--hover);
+    background-color: var(--hover);
 }
-#upload_menus .menu label{
-    cursor:pointer;
+#upload_menus .menu{
+    cursor: pointer;
 }
 
-@media screen and (min-width:0px) and (max-width:780px) and (min-height:0px) and (min-height:500px),
-screen and (min-width:0px) and (max-width:550px){
+@media screen and (min-width: 0px) and (max-width: 780px) and (min-height: 0px) and (min-height: 500px),
+screen and (min-width: 0px) and (max-width: 550px){
     main{
-        flex-direction:column;
-        justify-content:space-between;
+        flex-direction: column;
+        justify-content: space-between;
     }
     #dirs{
-        padding:.5rem;
+        padding: .5rem;
     }
     .dir{
-        font-size:2rem;
+        font-size: 2rem;
     }
     .dir .folder_name{
-        padding:.5rem 1rem;
+        padding: .5rem 1rem;
     }
     .dir .arrow{
-        padding:.5rem;
+        padding: .5rem;
     }
     #file_section{
-        flex:1;
+        flex: 1;
     }
     #files{
-        margin-bottom:1rem;
+        margin-bottom: 1rem;
     }
     #upload_button{
-        position:absolute;
-        bottom:auto;
-        left:auto;
-        top:-7.5rem;
-        right:1.5rem;
+        position: absolute;
+        bottom: auto;
+        left: auto;
+        top: -7.5rem;
+        right: 1.5rem;
     }
     #upload_menus{
-        right:0;
+        right: 0;
     }
     #file_top_bar, #file_info, #drive_info{
-        padding:1.5rem;
+        padding: 1.5rem;
     }
     #file_menu{
-        padding:0 1.5rem;
+        padding: 0 1.5rem;
     }
-    #file_sub_menu{
-        padding:1rem 1.5rem 0 1.5rem;
+    #file_sub_menu .dropdown_content{
+        transform: translateY(1.5rem);
+        bottom: 100%;
     }
     #file_info_bar{
-        width:100%;
-        height:auto;
-        flex:none;
+        width: 100%;
+        height: auto;
+        flex: none;
     }
     .toast_wrap{
-        bottom:auto;
-        top:1rem;
-        flex-direction:column;
+        bottom: auto;
+        top: 1rem;
+        flex-direction: column;
     }
 }

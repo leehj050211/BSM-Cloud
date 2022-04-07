@@ -8,12 +8,12 @@ const progress = per => {
             progressBar.classList.add('on');
             window.setTimeout(() => {
                 progressBar.style.left=`${per-100}%`;
-            }, 1)
+            }, 1);
         }
     } else {
-        if (per>=100) {
+        if (per >= 100) {
             window.setTimeout(() => {
-                if (progressBarFlag-1==0) {
+                if (progressBarFlag-1 == 0) {
                     progressBar.classList.add('remove');
                 }
                 window.setTimeout(() => {
@@ -58,7 +58,7 @@ const ajax = async ({
 }) => {
     $('.loading').classList.add("on");
     let res;
-    try{
+    try {
         const get = async () => {
             switch (method) {
                 case 'get':
@@ -75,7 +75,7 @@ const ajax = async ({
         if (!rawResPass) {
             res = res.data;
         }
-    }catch(err) {
+    } catch(err) {
         console.log(err);
         loadingInit();
         if (!err.response) {
@@ -87,7 +87,7 @@ const ajax = async ({
             return;
         }
         if (!err.response.data.statusCode) {
-            switch(err.response.status) {
+            switch (err.response.status) {
                 case 413:
                     showAlert(`HTTP ERROR ${err.response.status} 파일 크기가 너무 큽니다.`);
                     break;
@@ -99,7 +99,7 @@ const ajax = async ({
         if (errorCallback && errorCallback(err.response.data)) {
             return;
         }
-        switch(err.response.data.statusCode) {
+        switch (err.response.data.statusCode) {
             case 401:
                 popupOpen($('#login_box'));
                 break;
@@ -108,9 +108,9 @@ const ajax = async ({
         }
         return;
     }
-    try{
+    try {
         callBack(res);
-    }catch(err) {
+    } catch(err) {
         console.log(err);
         loadingInit();
         showAlert('알 수 없는 에러가 발생하였습니다');

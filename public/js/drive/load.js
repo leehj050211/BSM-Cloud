@@ -1,4 +1,4 @@
-let driveId, folderId;
+let driveId, folderId, lastFolderId, lastFileId;
 const dirBar = $('#dirs');
 
 const dirView = Vue.createApp({
@@ -39,12 +39,22 @@ const fileInfoView = Vue.createApp({
             drive: {
                 total: 0,
                 used: 0
-            }
+            },
+            mode: 'normal'
         }
     },
     methods: {
         formatBytes: function(bytes) {
             return formatBytes(bytes);
+        },
+        changeMode: function(mode) {
+            this.mode = mode;
+            lastFolderId = folderId;
+        },
+        cancleMode: function() {
+            this.mode = 'normal';
+            selectFile(-1);
+            enterDir(lastFolderId);
         }
     }
 }).mount('#file_info_bar');
