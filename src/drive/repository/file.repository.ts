@@ -135,11 +135,12 @@ export class FileRepository extends Repository<File> {
         fileDto: FileDto,
         newFolderId: string
     ):Promise<void> {
-        const {driveId, folderId} = fileDto;
+        const {fileId, driveId, folderId} = fileDto;
         try {
             this.update({
-                driveId: new Buffer(driveId, 'hex'),
-                folderId: folderId === 'root'? null: new Buffer(folderId, 'hex')
+                fileId: new Buffer(fileId, 'hex'),
+                folderId: folderId === 'root'? null: new Buffer(folderId, 'hex'),
+                driveId: new Buffer(driveId, 'hex')
             }, {
                 folderId: newFolderId === 'root'? null: new Buffer(newFolderId, 'hex')
             })
