@@ -424,7 +424,7 @@ input[type=file]{
   gap:2rem;
   margin-bottom:3rem;
 }
-.popup input:not([type=number]){
+.popup input:not([type=number], [type=checkbox]){
   display:block;
   margin-bottom:2rem;
 }

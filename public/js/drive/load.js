@@ -21,6 +21,7 @@ const dirView = Vue.createApp({
 const filesView = Vue.createApp({
     data() {
         return {
+            folders: [],
             files: [],
             focus: -1
         }
@@ -36,11 +37,16 @@ const fileInfoView = Vue.createApp({
                 created: '',
                 isShare: false
             },
+            folder: {
+                folderId: '',
+                folderName: ''
+            },
             drive: {
                 total: 0,
                 used: 0
             },
-            mode: 'normal'
+            mode: 'normal',
+            type: 'none'
         }
     },
     methods: {
@@ -53,7 +59,7 @@ const fileInfoView = Vue.createApp({
         },
         cancleMode: function() {
             this.mode = 'normal';
-            selectFile(-1);
+            selectItem(-1);
             enterDir(lastFolderId);
         }
     }
@@ -115,10 +121,8 @@ const loadFiles = () => {
                 ...data.dir
             ];
             dirView.dirIdx = data.dir.length;
-            filesView.files = [
-                ...data.folders,
-                ...data.files
-            ];
+            filesView.folders = data.folders;
+            filesView.files = data.files;
             fileInfoView.drive = {
                 total: data.total,
                 used: data.used

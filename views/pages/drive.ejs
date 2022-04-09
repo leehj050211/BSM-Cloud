@@ -25,19 +25,21 @@
                 </ol>
             </header>
             <ul id="files">
-                <li v-for="(file, idx) in files" :class="{active:focus==file.fileId}" :onclick="file.fileId?`selectFile(${idx})`:`enterDir('${file.folderId}', '${file.folderName}')`">
-                    <div v-if="file.isShare" class="share_file_icon"></div>
-                    <div v-if="file.fileId" class="file_icon">
-                        {{file.fileName.split('.')[file.fileName.split('.').length-1].toUpperCase()}}
-                    </div>
-                    <div v-if="file.fileId" class="file_name">
-                        {{file.fileName}}
-                    </div>
-                    <div v-if="file.folderId" class="file_icon">
+                <li v-for="(folder, idx) in folders" :class="{active:focus==folder.folderId}" :onclick="`selectItem(${idx}, 'folder')`">
+                    <div v-if="folder.folderId" class="file_icon">
                         Folder
                     </div>
-                    <div v-if="file.folderId" class="file_name">
-                        {{file.folderName}}
+                    <div v-if="folder.folderId" class="file_name">
+                        {{folder.folderName}}
+                    </div>
+                </li>
+                <li v-for="(file, idx) in files" :class="{active:focus==file.fileId}" :onclick="`selectItem(${idx}, 'file')`">
+                    <div v-if="file.isShare" class="share_file_icon"></div>
+                    <div class="file_icon">
+                        {{file.fileName.split('.')[file.fileName.split('.').length-1].toUpperCase()}}
+                    </div>
+                    <div class="file_name">
+                        {{file.fileName}}
                     </div>
                 </li>
             </ul>
@@ -58,11 +60,18 @@
                     </li>
                 </ul>
             </div>
-            <div id="file_top_bar">
-                <h2 v-if="file.fileName">{{file.fileName}}</h2>
-                <h2 v-if="!file.fileName">선택된 파일 없음</h2>
+
+            <div v-if="type=='none'" id="file_top_bar">
+                <h2>선택된 파일 없음</h2>
             </div>
-            <div v-if="file.fileId">
+            <div v-if="type=='file'" id="file_top_bar">
+                <h2>{{file.fileName}}</h2>
+            </div>
+            <div v-if="type=='folder'" id="file_top_bar">
+                <h2>{{folder.folderName}}</h2>
+            </div>
+
+            <div v-if="type=='file'">
                 <div id="file_info">
                     <p>
                         <span>파일 크기: {{formatBytes(file.size)}} • 파일 공유</span>
@@ -99,6 +108,22 @@
                     <button class="button sub_button delete" v-on:click="cancleMode()">이동 취소</button>
                 </div>
             </div>
+            <div v-if="type=='folder'">
+                <div id="file_info">
+                    <details>
+                        <summary>폴더 ID</summary>
+                        <p>{{folder.folderId}}</p>
+                    </details>
+                </div>
+                <div v-if="mode=='normal'" id="file_menu">
+                    <button class="button main_button" v-on:click="changeMode('move')">폴더 이동</button>
+                </div>
+                <div v-if="mode=='move'" id="file_menu">
+                    <button class="button main_button accent" :onclick="`moveFolder('${folder.folderId}')`">여기로 이동</button>
+                    <button class="button sub_button delete" v-on:click="cancleMode()">이동 취소</button>
+                </div>
+            </div>
+
             <div id="drive_info">
                 <div id="total_used_bar">
                     <div></div>

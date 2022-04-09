@@ -1,25 +1,36 @@
-const selectFile = fileIdx => {
+const selectItem = (idx, type) => {
     if (fileInfoView.mode != 'normal') {
-        return;
-    }
-    if (fileIdx == -1) {
-        filesView.focus = -1;
-        fileInfoView.file = {
-            fileName: '',
-            fileId: '',
-            created: ''
+        if (type == 'folder' && fileInfoView.mode == 'move') {
+            const folderInfo = filesView.folders[idx];
+            enterDir(folderInfo.folderId, folderInfo.folderName);
         }
         return;
     }
-    filesView.focus = filesView.files[fileIdx].fileId;
-    fileInfoView.file = filesView.files[fileIdx];
-    fileShareView.file = filesView.files[fileIdx];
+    if (idx == -1) {
+        filesView.focus = -1;
+        fileInfoView.type = 'none';
+        return;
+    }
+    if (type == 'file') {
+        filesView.focus = filesView.files[idx].fileId;
+        fileInfoView.file = filesView.files[idx];
+        fileShareView.file = filesView.files[idx];
+    } else if (type == 'folder') {
+        const folderInfo = filesView.folders[idx];
+        if (filesView.focus == folderInfo.folderId) {
+            enterDir(folderInfo.folderId, folderInfo.folderName);
+            return;
+        }
+        filesView.focus = folderInfo.folderId;
+        fileInfoView.folder = folderInfo;
+    }
+    fileInfoView.type = type;
 }
 
 const refreshDir = () => {
     folderId = dirView.dirs[dirView.dirIdx].folderId;
     loadFiles();
-    selectFile(-1);
+    selectItem(-1);
 }
 
 const changeDir = (idx) => {
@@ -121,7 +132,7 @@ const deleteFile = async (fileId) => {
         callBack:() => {
             showToast("파일이 삭제되었습니다");
             loadFiles();
-            selectFile(-1);
+            selectItem(-1);
         }
     })
 }
@@ -145,7 +156,7 @@ const shareFile = async (fileId, flag) => {
         callBack:() => {
             showToast("파일 공유 설정이 변경되었습니다");
             loadFiles();
-            selectFile(-1);
+            selectItem(-1);
             popupClose($('#share_file_box'));
             if (flag) {
                 const fileUrl = `https://drive.bssm.kro.kr/share/${fileId}`;
@@ -210,6 +221,24 @@ const moveFile = async (fileId) => {
         },
         callBack:() => {
             showToast("파일이 이동되었습니다");
+            fileInfoView.changeMode('normal');
+            refreshDir();
+        }
+    })
+}
+
+const moveFolder = async (oldFolderId) => {
+    if (!confirm('폴더를 이동하시겠습니까?')) {
+        return;
+    }
+    ajax({
+        method:'post',
+        url:`drive/move/${driveId}/${oldFolderId}`,
+        payload:{
+            newFolderId:folderId
+        },
+        callBack:() => {
+            showToast("폴더가 이동되었습니다");
             fileInfoView.changeMode('normal');
             refreshDir();
         }
