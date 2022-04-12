@@ -124,8 +124,8 @@ const loadFiles = () => {
             filesView.folders = data.folders;
             filesView.files = data.files;
             fileInfoView.drive = {
-                total: data.total,
-                used: data.used
+                total: data.totalStorage,
+                used: data.usedStorage
             }
         }
     })
