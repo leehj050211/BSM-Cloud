@@ -5,13 +5,12 @@ import { FolderDto } from './dto/folder.dto';
 import { DriveRepository } from './repository/drive.repository';
 import { FileRepository } from './repository/file.repository';
 import { ShareRepository } from './repository/shareCode.repository';
+import { FolderRepository } from './repository/folder.repository';
+import { DriveUtil } from './drive.util';
 
 import * as fs from 'fs'
 import * as contentDisposition from 'content-disposition';
 import { Response } from 'express';
-import { FolderRepository } from './repository/folder.repository';
-import { Drive } from './entity/drive.entity';
-import { File } from './entity/file.entity';
 
 const storagePath = `${__dirname}/${process.env.STORAGE_PATH}`;
 
@@ -26,44 +25,9 @@ export class DriveService {
         @InjectRepository(ShareRepository)
         private shareRepository: ShareRepository,
         @InjectRepository(FolderRepository)
-        private folderRepository: FolderRepository
+        private folderRepository: FolderRepository,
+        private driveUtil: DriveUtil
     ) {}
-
-    async driveCheck(inputDriveId: string, usercode: number): Promise<Drive> {
-        const drive = await this.driveRepository.getDriveByUsercode(usercode);
-        if (!drive) {
-            throw new NotFoundException('Drive not found');
-        }
-        const driveId = drive.id.toString('hex');
-        if (inputDriveId !== driveId) {
-            throw new BadRequestException(`Drive doesn't match`);
-        }
-        return drive;
-    }
-
-    async fileCheck(fileDto: FileDto): Promise<File> {
-        const file = await this.fileRepository.getFileByFileDto(fileDto);
-        if (!file) {
-            throw new NotFoundException('File not found');
-        }
-        return file;
-    }
-
-    async getDir(folderDto: FolderDto): Promise<string> {
-        const {folderId} = folderDto;
-        let dirInfo: {folderId: Buffer, folderName: string}[] = [];
-        if (folderId !== 'root') {
-            // folder check
-            dirInfo = await this.folderRepository.getDir(folderDto);
-            if (!dirInfo) {
-                throw new NotFoundException('Folder not found');
-            }
-            return dirInfo.map(e => {
-                return e.folderId.toString('hex');
-            }).join('/')+'/';
-        }
-        return '';
-    }
 
     async createDrive(usercode: number) {
         // 1.5GB
@@ -100,7 +64,7 @@ export class DriveService {
     async getFileList(usercode: number, folderDto: FolderDto) {
         const {driveId} = folderDto;
         // drive check
-        const {total: totalStorage, used: usedStorage} = await this.driveCheck(driveId, usercode);
+        const {total: totalStorage, used: usedStorage} = await this.driveUtil.driveCheck(driveId, usercode);
 
         const [filesInfo, foldersInfo, dir] = await Promise.all([
             this.fileRepository.getFileListByFolderDto(folderDto),
@@ -141,10 +105,10 @@ export class DriveService {
     async downloadFile(res: Response, usercode: number, fileDto: FileDto) {
         const {driveId} = fileDto;
         // drive check
-        await this.driveCheck(driveId, usercode);
+        await this.driveUtil.driveCheck(driveId, usercode);
         const [file, dir] = await Promise.all([
-            this.fileCheck(fileDto),
-            this.getDir(fileDto)
+            this.driveUtil.fileCheck(fileDto),
+            this.driveUtil.getDir(fileDto)
         ]);
 
         const filePath = `${storagePath}/${driveId}/${dir}${file.fileName.toString('hex')}`;
@@ -170,8 +134,8 @@ export class DriveService {
     async uploadFile(usercode: number, folderDto: FolderDto, inputFile) {
         const {driveId, folderId} = folderDto;
         // drive check
-        const drive = await this.driveCheck(driveId, usercode);
-        const dir = await this.getDir(folderDto);
+        const drive = await this.driveUtil.driveCheck(driveId, usercode);
+        const dir = await this.driveUtil.getDir(folderDto);
 
         const fileSize = parseInt(inputFile.size);
         const totalUsed = drive.used + fileSize;
@@ -214,10 +178,10 @@ export class DriveService {
     async updateFile(usercode: number, fileDto: FileDto, inputFile) {
         const {driveId} = fileDto;
         // drive check
-        const drive = await this.driveCheck(driveId, usercode);
+        const drive = await this.driveUtil.driveCheck(driveId, usercode);
         const [file, dir] = await Promise.all([
-            this.fileCheck(fileDto),
-            this.getDir(fileDto)
+            this.driveUtil.fileCheck(fileDto),
+            this.driveUtil.getDir(fileDto)
         ]);
 
         const oldFileName = file.fileName.toString('hex');
@@ -272,10 +236,10 @@ export class DriveService {
     async deleteFile(usercode: number, fileDto: FileDto) {
         const {driveId} = fileDto;
         // drive check
-        const drive = await this.driveCheck(driveId, usercode);
+        const drive = await this.driveUtil.driveCheck(driveId, usercode);
         const [file, dir] = await Promise.all([
-            this.fileCheck(fileDto),
-            this.getDir(fileDto)
+            this.driveUtil.fileCheck(fileDto),
+            this.driveUtil.getDir(fileDto)
         ]);
 
         const fileName = file.fileName.toString('hex');
@@ -300,11 +264,11 @@ export class DriveService {
             throw new ConflictException('Same directory');
         }
         // drive check
-        await this.driveCheck(driveId, usercode);
+        await this.driveUtil.driveCheck(driveId, usercode);
         const [file, oldDir, newDir] = await Promise.all([
-            this.fileCheck(fileDto),
-            this.getDir(fileDto),
-            this.getDir({driveId, folderId: newFolderId})
+            this.driveUtil.fileCheck(fileDto),
+            this.driveUtil.getDir(fileDto),
+            this.driveUtil.getDir({driveId, folderId: newFolderId})
         ]);
 
         const fileName = file.fileName.toString('hex');
@@ -324,8 +288,8 @@ export class DriveService {
         const {driveId} = fileDto;
         // drive check
         Promise.all([
-            await this.driveCheck(driveId, usercode),
-            await this.fileCheck(fileDto)
+            await this.driveUtil.driveCheck(driveId, usercode),
+            await this.driveUtil.fileCheck(fileDto)
         ]);
 
         try {
@@ -341,8 +305,8 @@ export class DriveService {
         const {driveId, fileId: inputFileId} = fileDto;
         // drive check
         await Promise.all([
-            this.driveCheck(driveId, usercode),
-            this.fileCheck(fileDto)
+            this.driveUtil.driveCheck(driveId, usercode),
+            this.driveUtil.fileCheck(fileDto)
         ]);
 
         // 2분 뒤
@@ -358,9 +322,9 @@ export class DriveService {
     async createFolder(usercode: number, folderDto: FolderDto, folderName: string) {
         const {driveId} = folderDto;
         // drive check
-        await this.driveCheck(driveId, usercode);
+        await this.driveUtil.driveCheck(driveId, usercode);
         const [dir, isExist] = await Promise.all([
-            this.getDir(folderDto),
+            this.driveUtil.getDir(folderDto),
             this.folderRepository.getFolderByName(folderDto, folderName)
         ]);
         
@@ -392,10 +356,10 @@ export class DriveService {
             throw new ConflictException('Same directory');
         }
         // drive check
-        await this.driveCheck(driveId, usercode);
+        await this.driveUtil.driveCheck(driveId, usercode);
         const [oldDir, newDir] = await Promise.all([
-            this.getDir(folderDto),
-            this.getDir({driveId, folderId: newFolderId})
+            this.driveUtil.getDir(folderDto),
+            this.driveUtil.getDir({driveId, folderId: newFolderId})
         ]);
 
         // folderName check

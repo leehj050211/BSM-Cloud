@@ -2,11 +2,12 @@ import { Injectable, InternalServerErrorException, NotFoundException } from '@ne
 import { InjectRepository } from '@nestjs/typeorm';
 import { FileRepository } from 'src/drive/repository/file.repository';
 import { ShareRepository } from 'src/drive/repository/shareCode.repository';
+import { FolderRepository } from 'src/drive/repository/folder.repository';
+import { DriveUtil } from 'src/drive/drive.util';
 
 import * as fs from 'fs'
 import * as contentDisposition from 'content-disposition';
 import { Response } from 'express';
-import { FolderRepository } from 'src/drive/repository/folder.repository';
 
 const storagePath = `${__dirname}/${process.env.STORAGE_PATH}`;
 
@@ -19,7 +20,8 @@ export class ShareService {
         @InjectRepository(FolderRepository)
         private folderRepository: FolderRepository,
         @InjectRepository(ShareRepository)
-        private shareRepository: ShareRepository
+        private shareRepository: ShareRepository,
+        private driveUtil: DriveUtil
     ) {}
     
     async getFileInfo({
@@ -70,20 +72,10 @@ export class ShareService {
 
         const folderId = file.folderId === null? 'root': file.folderId.toString('hex');
         const driveId = file.driveId.toString('hex');
-        let dirInfo: {folderId: Buffer, folderName: string}[] = [];
-        let dir = '';
-        if (folderId !== 'root') {
-            // folder check
-            dirInfo = await this.folderRepository.getDir({folderId, driveId});
-            if (!dirInfo) {
-                throw new NotFoundException('Folder not found');
-            }
-            dir = dirInfo.map(e => {
-                return e.folderId.toString('hex');
-            }).join('/');
-        }
 
-        const filepath = `${storagePath}/${driveId}/${folderId === 'root'? '': dir+'/'}${file.fileName.toString('hex')}`;
+        
+        const dir = await this.driveUtil.getDir({folderId, driveId});
+        const filepath = `${storagePath}/${driveId}/${dir}${file.fileName.toString('hex')}`;
         let fileStat;
         try {
             fileStat = await fs.promises.stat(filepath);
