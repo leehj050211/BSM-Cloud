@@ -16,12 +16,12 @@ export class DriveController {
 
     @Post()
     createDrive(@GetUser() user: User) {
-        return this.driveService.createDrive(user.memberCode);
+        return this.driveService.createDrive(user.code);
     }
 
     @Get()
     getDrive(@GetUser() user: User) {
-        return this.driveService.getDrive(user.memberCode);
+        return this.driveService.getDrive(user.code);
     }
 
     @Get(':driveId/:folderId')
@@ -29,7 +29,7 @@ export class DriveController {
         @GetUser() user: User,
         @Param() FolderDto
     ) {
-        return this.driveService.getFileList(user.memberCode, FolderDto);
+        return this.driveService.getFileList(user.code, FolderDto);
     }
     
     @Get(':driveId/:folderId/:fileId')
@@ -38,7 +38,7 @@ export class DriveController {
         @GetUser() user: User,
         @Param() FileDto
     ) {
-        return this.driveService.downloadFile(res, user.memberCode, FileDto);
+        return this.driveService.downloadFile(res, user.code, FileDto);
     }
 
     @UseInterceptors(FileInterceptor('file', FileMulterOption))
@@ -48,7 +48,7 @@ export class DriveController {
         @Param() FolderDto,
         @UploadedFile() inputFile
     ) {
-        return this.driveService.uploadFile(user.memberCode, FolderDto, inputFile);
+        return this.driveService.uploadFile(user.code, FolderDto, inputFile);
     }
 
     @UseInterceptors(FileInterceptor('file', FileMulterOption))
@@ -58,7 +58,7 @@ export class DriveController {
         @Param() FileDto,
         @UploadedFile() inputFile
     ) {
-        return this.driveService.updateFile(user.memberCode, FileDto, inputFile);
+        return this.driveService.updateFile(user.code, FileDto, inputFile);
     }
 
     @Delete(':driveId/:folderId/:fileId')
@@ -66,7 +66,7 @@ export class DriveController {
         @GetUser() user: User,
         @Param() FileDto
     ) {
-        return this.driveService.deleteFile(user.memberCode, FileDto);
+        return this.driveService.deleteFile(user.code, FileDto);
     }
 
     @Post('move/:driveId/:folderId/:fileId')
@@ -75,7 +75,7 @@ export class DriveController {
         @Param() FileDto,
         @Body('newFolderId') newFolderId: string
     ) {
-        return this.driveService.moveFile(user.memberCode, FileDto, newFolderId);
+        return this.driveService.moveFile(user.code, FileDto, newFolderId);
     }
 
     @Post('share/:driveId/:folderId/:fileId')
@@ -84,7 +84,7 @@ export class DriveController {
         @Param() FileDto,
         @Body('share', ParseBoolPipe) share: boolean
     ) {
-        return this.driveService.shareFile(user.memberCode, FileDto, share);
+        return this.driveService.shareFile(user.code, FileDto, share);
     }
 
     @Post('code/:driveId/:folderId/:fileId')
@@ -92,7 +92,7 @@ export class DriveController {
         @GetUser() user: User,
         @Param() FileDto,
     ) {
-        return this.driveService.shareCode(user.memberCode, FileDto);
+        return this.driveService.shareCode(user.code, FileDto);
     }
 
     @Post('folder/:driveId/:folderId')
@@ -101,7 +101,7 @@ export class DriveController {
         @Param() FolderDto,
         @Body('folderName') folderName
     ) {
-        return this.driveService.createFolder(user.memberCode, FolderDto, folderName);
+        return this.driveService.createFolder(user.code, FolderDto, folderName);
     }
 
     @Post('move/:driveId/:folderId')
@@ -110,6 +110,6 @@ export class DriveController {
         @Param() FolderDto,
         @Body('newFolderId') newFolderId: string
     ) {
-        return this.driveService.moveFolder(user.memberCode, FolderDto, newFolderId);
+        return this.driveService.moveFolder(user.code, FolderDto, newFolderId);
     }
 }

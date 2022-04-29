@@ -132,7 +132,7 @@ export class DriveService {
     }
 
     async uploadFile(usercode: number, folderDto: FolderDto, inputFile) {
-        const {driveId, folderId} = folderDto;
+        const {driveId} = folderDto;
         // drive check
         const drive = await this.driveUtil.driveCheck(driveId, usercode);
         const dir = await this.driveUtil.getDir(folderDto);

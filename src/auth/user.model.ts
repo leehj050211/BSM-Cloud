@@ -1,10 +1,11 @@
 export class User {
-    isLogin:boolean
-    memberCode:number
-    memberId:string
-    memberNickname:string
-    memberLevel:number
-    grade:number
-    classNo:number
-    studentNo:number
+    code: number
+    level: number
+    id: string
+    nickname: string
+    enrolled: number
+    grade: number
+    classNo: number
+    studentNo: number
+    name: string
 }
