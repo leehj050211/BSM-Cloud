@@ -80,7 +80,7 @@ export class FolderRepository extends Repository<Folder> {
 
     async createFolder(
         folderDto: FolderDto,
-        usercode: number,
+        userCode: number,
         folderName: string,
         created: Date,
     ):Promise<Folder> {
@@ -89,7 +89,7 @@ export class FolderRepository extends Repository<Folder> {
         const folder = this.create({
             folderId: new Buffer(folderId, 'hex'),
             driveId: new Buffer(driveId, 'hex'),
-            usercode,
+            userCode,
             folderName,
             created,
             isShare: false,

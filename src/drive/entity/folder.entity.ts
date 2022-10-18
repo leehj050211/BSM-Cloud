@@ -21,7 +21,7 @@ export class Folder {
         unsigned: true,
         nullable: false
     })
-    usercode: number;
+    userCode: number;
 
     @Column({
         length: 255,

@@ -1,59 +1,77 @@
-import { HttpService, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Request } from 'express';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { User } from './user.model';
+import { InjectRepository } from '@nestjs/typeorm';
+import { JwtService } from '@nestjs/jwt';
+import { Repository } from 'typeorm';
+import { User } from './user';
+import { UserEntity } from 'src/user/entity/user.entity';
+import { TokenEntity } from 'src/auth/entity/token.entity';
+
+const { SECRET_KEY } = process.env;
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(
-        private httpService: HttpService) {
+        private jwtService: JwtService,
+        @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
+        @InjectRepository(TokenEntity) private tokenRepository: Repository<TokenEntity>
+    ) {
         super({
             jwtFromRequest: ExtractJwt.fromExtractors([
                 (req: Request) => {
-                    return req?.cookies?.token || req?.cookies?.refreshToken;
+                    return req?.cookies?.bsm_cloud_token || req?.cookies?.bsm_cloud_refresh_token;
                 }
             ]),
             secretOrKey: process.env.SECRET_KEY,
-            passReqToCallback: true,
+            passReqToCallback: true
         })
     }
 
-    private readonly TOKEN_API_URL = 'https://bssm.kro.kr/api/account/token';
-    async validate(req: Request, user: User) {
-        if (
-            typeof user.code != 'number' ||
-            typeof user.level != 'number' ||
-            typeof user.id != 'string' ||
-            typeof user.nickname != 'string' ||
-            typeof user.grade != 'number' ||
-            typeof user.grade != 'number' ||
-            typeof user.classNo != 'number' ||
-            typeof user.studentNo != 'number' ||
-            typeof user.name != 'string'
-        ) {
-            if (!(req?.cookies?.refreshToken)) {
-                throw new UnauthorizedException();
-            }
-            try {
-                const result = await this.httpService.post(this.TOKEN_API_URL, {
-                    refreshToken: req.cookies.refreshToken
-                }).toPromise();
-                
-                req.res.cookie('token', result.data.token, {
-                    domain: '.bssm.kro.kr',
-                    path: '/',
-                    httpOnly: true,
-                    secure: true,
-                    maxAge: 1000*60*60// 1시간 동안 저장 1000ms*60초*60분
-                });
-                return result.data.user;
-            } catch (err) {
-                console.error(err);
-                throw new UnauthorizedException();
-            }
-        } else {
+    async validate(req: Request, user: User): Promise<User> {
+        if (user.code) {
             return user;
         }
+        const { refreshToken } = this.jwtService.verify(req?.cookies?.bsm_cloud_refresh_token);
+        if (refreshToken === undefined) {
+            throw new UnauthorizedException();
+        }
+        const tokenInfo = await this.getToken(refreshToken);
+        if (tokenInfo === null) {
+            throw new UnauthorizedException();
+        }
+        const userInfo = await this.getUser(tokenInfo.userCode);
+        if (userInfo === null) {
+            throw new UnauthorizedException();
+        }
+        
+        const token = this.jwtService.sign({...userInfo}, {
+            secret: SECRET_KEY,
+            algorithm: 'HS256',
+            expiresIn: '1h'
+        });
+        req.res.cookie('token', token, {
+            path: '/',
+            httpOnly: true,
+            maxAge: 1000*60*60
+        });
+        return userInfo;
+    }
+
+    private async getUser(usercode: number): Promise<UserEntity | null> {
+        return this.userRepository.findOne({
+          where: {
+            usercode
+          }
+        })
+      }
+
+    private async getToken(token: string): Promise<TokenEntity | null> {
+        return await this.tokenRepository.findOne({
+            where: {
+                token
+            }
+        })
     }
 }

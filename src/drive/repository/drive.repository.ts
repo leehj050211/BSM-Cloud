@@ -7,11 +7,11 @@ import { ConflictException, InternalServerErrorException } from "@nestjs/common"
 @EntityRepository(Drive)
 export class DriveRepository extends Repository<Drive> {
 
-    async createDrive(usercode: number, total: number): Promise<Drive> {
+    async createDrive(userCode: number, total: number): Promise<Drive> {
         const uuid = getUuid().replaceAll('-', '')
         const drive = this.create({
             id: new Buffer(uuid, 'hex'),
-            usercode,
+            userCode,
             total,
             used: 0
         });
@@ -28,9 +28,9 @@ export class DriveRepository extends Repository<Drive> {
         }
     }
 
-    async getDriveByUsercode(usercode: number): Promise<Drive> {
+    async getDriveByUsercode(userCode: number): Promise<Drive> {
         const driveId = this.findOne({
-            usercode
+            userCode
         });
         return driveId;
     }

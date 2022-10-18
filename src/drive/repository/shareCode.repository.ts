@@ -1,5 +1,5 @@
 import { EntityRepository, MoreThanOrEqual, Repository } from "typeorm";
-import { ShareCode } from "../entity/shareCode.entity";
+import { ShareCode } from "../../share/entity/shareCode.entity";
 
 import { v4 as getUuid } from 'uuid';
 import { InternalServerErrorException } from "@nestjs/common";

@@ -5,6 +5,7 @@ import { DriveModule } from './drive/drive.module';
 import { AuthModule } from './auth/auth.module';
 import { AppController } from './app.controller';
 import { ShareModule } from './share/share.module';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { ShareModule } from './share/share.module';
     }),
     DriveModule,
     AuthModule,
-    ShareModule],
+    ShareModule,
+    UserModule],
   controllers: [AppController],
   providers: [],
 })

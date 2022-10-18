@@ -1,10 +1,8 @@
 import { Body, Controller, Delete, Get, Param, ParseBoolPipe, Post, Put, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { DriveService } from './drive.service';
-import { FileDto } from './dto/file.dto';
-import { FolderDto } from './dto/folder.dto';
 import JwtAuthGuard from 'src/auth/auth.guard';
 import { GetUser } from 'src/auth/getUser.decorator';
-import { User } from 'src/auth/user.model';
+import { User } from 'src/auth/user';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileMulterOption } from './file.multerOption';
 import { Response } from 'express';

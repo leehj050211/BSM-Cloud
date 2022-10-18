@@ -28,7 +28,7 @@ export class File {
         unsigned: true,
         nullable: false
     })
-    usercode: number;
+    userCode: number;
 
     @Column({
         length: 255,

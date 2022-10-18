@@ -17,8 +17,6 @@ export class ShareService {
     constructor(
         @InjectRepository(FileRepository)
         private fileRepository: FileRepository,
-        @InjectRepository(FolderRepository)
-        private folderRepository: FolderRepository,
         @InjectRepository(ShareRepository)
         private shareRepository: ShareRepository,
         private driveUtil: DriveUtil

@@ -43,7 +43,7 @@ export class FileRepository extends Repository<File> {
 
     async uploadFile(
         folderDto: FolderDto,
-        usercode: number,
+        userCode: number,
         originalName: string,
         fileName: string,
         created: Date,
@@ -55,7 +55,7 @@ export class FileRepository extends Repository<File> {
             fileId: new Buffer(fileId, 'hex'),
             folderId: folderId === 'root'? null: new Buffer(folderId, 'hex'),
             driveId: new Buffer(driveId, 'hex'),
-            usercode,
+            userCode,
             originalName,
             fileName: new Buffer(fileName, 'hex'),
             created,
