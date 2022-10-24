@@ -14,11 +14,11 @@
 
 <div id="login_box" class="popup main center">
     <div class="popup_close_button x_button" onClick="popupClose(this.parentElement)"></div>
-    <div class="logo"><img src="https://bssm.kro.kr/icons/logo.png" alt="로고"></div>
     <h2>로그인</h2>
-    <p>BSM Cloud를 이용하기위해 BSM 계정으로 로그인이 필요합니다.</p>
-    <br>
-    <a href="https://bssm.kro.kr/login" class="button accent main_button">로그인 페이지 이동</a>
+    <a class="button main_button oauth_button" href="https://auth.bssm.kro.kr/oauth?clientId=7f2e3149&redirectURI=https://drive.bssm.kro.kr/api/user/oauth/bsm">
+        <img src="/icons/bsm-icon.png" alt="bsm-icon"/>
+        <span>BSM 계정으로 계속</span>
+    </a>
 </div>
 
 <script src="/js/alert.js"></script>

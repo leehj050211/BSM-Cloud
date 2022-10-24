@@ -51,9 +51,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             algorithm: 'HS256',
             expiresIn: '1h'
         });
-        req.res.cookie('token', token, {
+        req.res.cookie('bsm_cloud_token', token, {
             path: '/',
             httpOnly: true,
+            secure: true,
             maxAge: 1000*60*60
         });
         return userInfo;
@@ -61,14 +62,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     private async getUser(usercode: number): Promise<UserEntity | null> {
         return this.userRepository.findOne({
-          where: {
-            usercode
-          }
+            where: {
+                code: usercode
+            }
         })
-      }
+    }
 
     private async getToken(token: string): Promise<TokenEntity | null> {
-        return await this.tokenRepository.findOne({
+        return this.tokenRepository.findOne({
             where: {
                 token
             }
