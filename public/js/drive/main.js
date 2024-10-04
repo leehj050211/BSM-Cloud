@@ -159,7 +159,7 @@ const shareFile = async (fileId, flag) => {
             selectItem(-1);
             popupClose($('#share_file_box'));
             if (flag) {
-                const fileUrl = `https://drive.bssm.kro.kr/share/${fileId}`;
+                const fileUrl = `https://drive.bssm.app/share/${fileId}`;
                 navigator.clipboard.writeText(fileUrl);
                 $('#share_file_url').innerText = fileUrl;
                 $('#share_file_url').href = fileUrl;

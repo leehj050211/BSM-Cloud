@@ -8,7 +8,7 @@ import { UserEntity } from 'src/user/entity/user.entity';
 import { UserSignUpRequest } from 'src/user/dto/request/userSignUpRequest';
 import { TokenEntity } from 'src/auth/entity/token.entity';
 import { User } from 'src/auth/user';
-import BsmOauth, { BsmOauthError, BsmOauthErrorType, BsmOauthUserRole, StudentResource, TeacherResource } from 'bsm-oauth';
+import BsmOauth, { BsmOauthError, BsmOauthErrorType, BsmUserRole, BsmStudentResource, BsmTeacherResource } from 'bsm-oauth';
 
 const { BSM_OAUTH_CLIENT_ID, BSM_OAUTH_CLIENT_SECRET, SECRET_KEY } = process.env;
 
@@ -29,7 +29,7 @@ export class UserService {
         authCode: string
     ) {
 
-        let resource: StudentResource | TeacherResource;
+        let resource: BsmStudentResource | BsmTeacherResource;
         try {
             resource = await this.bsmOauth.getResource(
                 await this.bsmOauth.getToken(authCode)
@@ -56,7 +56,7 @@ export class UserService {
             await this.saveUser({
                 code: resource.userCode,
                 nickname: resource.nickname,
-                name: resource.role === BsmOauthUserRole.STUDENT? resource.student.name: resource.teacher.name
+                name: resource.role === BsmUserRole.STUDENT? resource.student.name: resource.teacher.name
             });
             userInfo = await this.getUserBycode(resource.userCode);
             if (!userInfo) {
@@ -64,7 +64,7 @@ export class UserService {
             }
         }
         await this.login(res, userInfo);
-        res.redirect('https://drive.bssm.kro.kr/drive');
+        res.redirect('https://drive.bssm.app/drive');
     }
 
     private async login(

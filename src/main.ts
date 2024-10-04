@@ -25,6 +25,6 @@ async function bootstrap() {
   app.useStaticAssets(`${__dirname}/${process.env.STATIC_PATH}`);
   app.setBaseViewsDir(`${__dirname}/${process.env.VIEWS_PATH}/pages`);
   app.setViewEngine('ejs');
-  await app.listen(4001);
+  await app.listen(4004);
 }
 bootstrap();

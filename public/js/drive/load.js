@@ -112,7 +112,7 @@ const loadFiles = () => {
         url: `drive/${driveId}/${folderId}`,
         callBack: data => {
             history.pushState(null, null, `/drive/${driveId}/${folderId}`);
-            $('#total_used_bar div').style.width = `${(data.used/data.total)*100}%`;
+            $('#total_used_bar div').style.width = `${(data.usedStorage/data.totalStorage)*100}%`;
             dirView.dirs = [
                 {
                     folderName:'내 드라이브',

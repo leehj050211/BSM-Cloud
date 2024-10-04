@@ -43,7 +43,7 @@ window.addEventListener('DOMContentLoaded', () => {
 })
 
 const instance = axios.create({
-    baseURL:'https://drive.bssm.kro.kr/api/',
+    baseURL:'/api',
     headers:{'Pragma':'no-cache'},
     timeout:3000,
 })
